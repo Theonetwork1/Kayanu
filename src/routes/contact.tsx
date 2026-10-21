@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteShell, PolicyPage } from "@/components/Layout";
-import { CONTACT_EMAIL } from "@/config";
+import { CONTACT_EMAIL, canonicalLink } from "@/config";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/contact")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
+    links: [canonicalLink("/contact")],
   }),
   component: Contact,
 });

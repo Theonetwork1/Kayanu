@@ -5,8 +5,6 @@ import {
   ShieldCheck,
   Truck,
   Package,
-  Minus,
-  Plus,
   X,
   Layers,
   Wind,
@@ -14,16 +12,14 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { SiteShell, useReveal } from "@/components/Layout";
-import { useCart } from "@/lib/cart";
-import { MAX_LINE_QTY } from "@/lib/cart-schema";
 import {
   ADDONS,
   COLORS,
-  KIT,
+  SITE_URL,
   VARIANTS,
   WELCOME_CODE,
+  canonicalLink,
   formatPrice,
-  getAddon,
   getVariant,
   type ColorId,
   type VariantId,
@@ -46,8 +42,11 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESC },
       { property: "og:type", content: "product" },
+      { property: "og:url", content: SITE_URL },
+      { property: "og:image", content: heroImg },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [canonicalLink("/")],
   }),
   component: Home,
 });
@@ -81,7 +80,7 @@ function Home() {
       <Comparison />
       <Guarantee />
       <Faq />
-      <EmailCapture />
+      {WELCOME_CODE && <WelcomeOffer code={WELCOME_CODE} />}
     </SiteShell>
   );
 }
@@ -269,11 +268,10 @@ function Inside() {
 }
 
 function Buy() {
-  const { add, setOpen } = useCart();
   const [color, setColor] = useState<ColorId>("charcoal");
   const [variant, setVariant] = useState<VariantId>("2-sets");
-  const [qty, setQty] = useState(1);
   const v = getVariant(variant);
+  const colorLabel = COLORS.find((c) => c.id === color)!.label;
   return (
     <section
       id="buy"
@@ -305,10 +303,7 @@ function Buy() {
         </p>
 
         <p className="mt-8 text-sm font-semibold">
-          Color:{" "}
-          <span className="font-normal text-muted-foreground">
-            {COLORS.find((c) => c.id === color)!.label}
-          </span>
+          Color: <span className="font-normal text-muted-foreground">{colorLabel}</span>
         </p>
         <div className="mt-3 flex gap-3">
           {COLORS.map((c) => (
@@ -339,11 +334,7 @@ function Buy() {
               )}
               <span>
                 <span className="block font-bold">{o.label}</span>
-                <span className="text-sm text-muted-foreground">
-                  {o.id === "2-sets"
-                    ? "16 cubes + 2 shoe pouches + 2 laundry bags · Free shipping"
-                    : "8 cubes + shoe pouch + laundry bag"}
-                </span>
+                <span className="text-sm text-muted-foreground">{o.includes}</span>
               </span>
               <span className="text-right">
                 <span className="block font-bold">{formatPrice(o.price)}</span>
@@ -355,34 +346,16 @@ function Buy() {
           ))}
         </div>
 
-        <div className="mt-6 flex gap-3">
-          <div className="flex items-center rounded-full border bg-card">
-            <button
-              aria-label="Decrease quantity"
-              className="p-3"
-              onClick={() => setQty(Math.max(1, qty - 1))}
-            >
-              <Minus className="h-4 w-4" />
-            </button>
-            <span className="w-8 text-center font-semibold">{qty}</span>
-            <button
-              aria-label="Increase quantity"
-              className="p-3"
-              onClick={() => setQty(Math.min(MAX_LINE_QTY, qty + 1))}
-            >
-              <Plus className="h-4 w-4" />
-            </button>
-          </div>
-          <button
-            className="btn-primary flex-1"
-            onClick={() => {
-              add({ type: "set", variant, color, qty });
-              setOpen(true);
-            }}
-          >
-            Add to Cart — {formatPrice(v.price * qty)}
-          </button>
-        </div>
+        {/* Each bundle checks out through its own Stripe payment link. The link asks for
+            the color again (a payment link can't be prefilled), so say it here. */}
+        <a href={v.checkoutUrl} className="btn-primary mt-6 w-full">
+          Buy now — {formatPrice(v.price)}
+        </a>
+        <p className="mt-3 text-center text-sm text-muted-foreground">
+          Secure checkout by Stripe. Select <strong>{colorLabel}</strong> as your set color on the
+          next page
+          {variant === "2-sets" ? " — need more sets? You can change the quantity there." : "."}
+        </p>
 
         <ul className="mt-6 space-y-2 text-sm">
           {[
@@ -418,13 +391,6 @@ function Buy() {
 }
 
 function CompleteKit() {
-  const { add, setOpen } = useCart();
-  const [kitColor, setKitColor] = useState<ColorId>("charcoal");
-  const kitPrice = getVariant(KIT.variant).price + getAddon(KIT.addon).price;
-  const addAndOpen = (...lines: Parameters<typeof add>) => {
-    add(...lines);
-    setOpen(true);
-  };
   return (
     <section id="complete-kit" className="scroll-mt-28 py-20">
       <div className="mx-auto max-w-6xl px-5">
@@ -432,88 +398,42 @@ function CompleteKit() {
           <Eyebrow>Complete your kit</Eyebrow>
           <h2 className="text-3xl font-extrabold sm:text-4xl">More room. Zero chaos.</h2>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            The add-ons travelers pair with the set. Everything goes in the same cart and ships in
-            3–8 business days.
+            The add-ons travelers pair with the set. The Complete Kit is a single checkout; solo
+            add-ons check out separately. Everything ships in 3–8 business days.
           </p>
         </div>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
-          <AddonCard
-            image={KIT.image}
-            name={KIT.name}
-            tagline={KIT.tagline}
-            price={kitPrice}
-            badge={KIT.badge}
-            onAdd={() =>
-              addAndOpen(
-                { type: "set", variant: KIT.variant, color: kitColor, qty: 1 },
-                { type: "addon", addon: KIT.addon, qty: 1 },
-              )
-            }
-          >
-            <div className="mt-4 flex items-center gap-2">
-              <span className="text-xs font-semibold">Set color:</span>
-              {COLORS.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => setKitColor(c.id)}
-                  aria-label={`Kit color ${c.label}`}
-                  aria-pressed={kitColor === c.id}
-                  className={`h-7 w-7 rounded-full border-2 ring-offset-2 ring-offset-secondary transition ${kitColor === c.id ? "ring-2 ring-primary" : ""}`}
-                  style={{ background: c.swatch }}
-                />
-              ))}
-            </div>
-          </AddonCard>
           {ADDONS.map((a) => (
-            <AddonCard
+            <div
               key={a.id}
-              image={a.image}
-              name={a.name}
-              tagline={a.tagline}
-              price={a.price}
-              onAdd={() => addAndOpen({ type: "addon", addon: a.id, qty: 1 })}
-            />
+              className="reveal flex flex-col overflow-hidden rounded-3xl bg-secondary shadow-[var(--shadow-soft)]"
+            >
+              <img
+                src={a.image}
+                alt={a.name}
+                loading="lazy"
+                className="aspect-[4/3] w-full object-cover"
+              />
+              <div className="flex flex-1 flex-col p-6">
+                {a.badge ? (
+                  <span className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
+                    {a.badge}
+                  </span>
+                ) : null}
+                <h3 className="font-bold">{a.name}</h3>
+                <p className="mt-2 flex-1 text-sm text-muted-foreground">{a.tagline}</p>
+                <div className="mt-5 flex items-center justify-between">
+                  <span className="text-xl font-extrabold">{formatPrice(a.price)}</span>
+                  <a href={a.checkoutUrl} className="btn-primary">
+                    Buy now
+                  </a>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       </div>
     </section>
-  );
-}
-
-function AddonCard(props: {
-  image: string;
-  name: string;
-  tagline: string;
-  price: number;
-  badge?: string;
-  onAdd: () => void;
-  children?: React.ReactNode;
-}) {
-  return (
-    <div className="reveal flex flex-col overflow-hidden rounded-3xl bg-secondary shadow-[var(--shadow-soft)]">
-      <img
-        src={props.image}
-        alt={props.name}
-        loading="lazy"
-        className="aspect-[4/3] w-full object-cover"
-      />
-      <div className="flex flex-1 flex-col p-6">
-        {props.badge ? (
-          <span className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
-            {props.badge}
-          </span>
-        ) : null}
-        <h3 className="font-bold">{props.name}</h3>
-        <p className="mt-2 flex-1 text-sm text-muted-foreground">{props.tagline}</p>
-        {props.children}
-        <div className="mt-5 flex items-center justify-between">
-          <span className="text-xl font-extrabold">{formatPrice(props.price)}</span>
-          <button onClick={props.onAdd} className="btn-primary">
-            Add to cart
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -617,37 +537,19 @@ function Faq() {
   );
 }
 
-function EmailCapture() {
-  const [done, setDone] = useState(false);
+// Shown only when WELCOME_CODE is set in config.ts (the code must exist in Stripe).
+function WelcomeOffer({ code }: { code: string }) {
   return (
     <section className="px-5">
       <div className="reveal card-soft mx-auto max-w-3xl p-8 text-center sm:p-12">
-        <h2 className="text-2xl font-extrabold sm:text-3xl">Get 10% off your first order</h2>
-        <p className="mt-2 text-muted-foreground">Enter your email to reveal your welcome code.</p>
-        {done ? (
-          <p className="mt-6 font-semibold text-accent">
-            Your code:{" "}
-            <span className="rounded-lg bg-accent/15 px-2 py-1 font-mono">{WELCOME_CODE}</span> —
-            enter it at checkout.
-          </p>
-        ) : (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setDone(true);
-            }}
-            className="mx-auto mt-6 flex max-w-md flex-col gap-3 sm:flex-row"
-          >
-            <input
-              type="email"
-              required
-              placeholder="you@example.com"
-              aria-label="Email address"
-              className="flex-1 rounded-full border bg-background px-5 py-3 outline-none focus:ring-2 focus:ring-ring"
-            />
-            <button className="btn-primary">Get 10% off</button>
-          </form>
-        )}
+        <h2 className="text-2xl font-extrabold sm:text-3xl">10% off your first order</h2>
+        <p className="mt-4 text-muted-foreground">
+          Enter{" "}
+          <span className="rounded-lg bg-accent/15 px-2 py-1 font-mono font-semibold text-accent">
+            {code}
+          </span>{" "}
+          in the promotion code field at checkout.
+        </p>
       </div>
     </section>
   );

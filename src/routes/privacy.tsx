@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteShell, PolicyPage } from "@/components/Layout";
-import { CONTACT_EMAIL, STORE_NAME } from "@/config";
+import { CONTACT_EMAIL, STORE_NAME, canonicalLink } from "@/config";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/privacy")({
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
     ],
+    links: [canonicalLink("/privacy")],
   }),
   component: () => (
     <SiteShell>

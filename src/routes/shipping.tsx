@@ -1,6 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteShell, PolicyPage } from "@/components/Layout";
-import { CONTACT_EMAIL, FREE_SHIPPING_THRESHOLD, SHIPPING_FLAT, formatPrice } from "@/config";
+import {
+  CONTACT_EMAIL,
+  FREE_SHIPPING_THRESHOLD,
+  SHIPPING_FLAT,
+  formatPrice,
+  canonicalLink,
+} from "@/config";
 
 export const Route = createFileRoute("/shipping")({
   head: () => ({
@@ -19,6 +25,7 @@ export const Route = createFileRoute("/shipping")({
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
     ],
+    links: [canonicalLink("/shipping")],
   }),
   component: () => (
     <SiteShell>
