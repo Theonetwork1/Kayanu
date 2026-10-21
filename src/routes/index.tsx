@@ -5,8 +5,8 @@ import { SiteShell, useReveal } from "@/components/Layout";
 import { useCart } from "@/lib/cart";
 import { COLORS, VARIANTS, formatPrice, getVariant, type ColorId, type VariantId } from "@/config";
 const heroImg = "https://s.alicdn.com/@sc04/kf/H98ada98627f3418784ac2191c9f120b0R.jpg"; // Authentic supplier photo — Shenzhen Yumi 8-pc compression set (composition cible)
-const flatlayImg = "https://s.alicdn.com/@sc04/kf/H03ee5a2e237b44d1b545e40d69b4f2f6D.jpg"; // Authentic supplier photo — charcoal compression cubes lineup
-const compressImg = "https://s.alicdn.com/@sc04/kf/H0778e3abb1ee4600a129058a84e6378dq.jpg"; // Authentic supplier photo — beige compression cubes, lifestyle
+const flatlayImg = "https://s.alicdn.com/@sc04/kf/H88755db5b1d64dfd8cda54d16e9559c88.jpg"; // Authentic supplier photo — charcoal compression cubes lineup
+const compressImg = "https://s.alicdn.com/@sc04/kf/He37eee519eb344c2a9c3a13c32dbeff9I.jpg"; // Authentic supplier photo — beige compression cubes, lifestyle
 
 const TITLE = "KAYANU — Compression Packing Cubes | Pack More, Stress Less";
 const DESC = "KAYANU 8-piece compression packing cube set with shoe pouch and laundry bag. Fits carry-on and checked luggage. Fast U.S. shipping, 30-day guarantee.";
