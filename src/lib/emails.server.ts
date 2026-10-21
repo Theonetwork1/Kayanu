@@ -200,7 +200,7 @@ export function orderConfirmation(o: Order): Mail | null {
   const first = o.name?.split(" ")[0];
   const body = [
     h1(`Thank you${first ? `, ${esc(first)}` : ""}!`),
-    p(`We've received your order <strong>${esc(o.number)}</strong> and it's being prepared at our U.S. warehouse.`),
+    p(`We've received your order <strong>${esc(o.number)}</strong> and it's being prepared for shipping.`),
     itemsTable(o, true),
     addressBlock(o),
     p(
