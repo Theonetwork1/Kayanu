@@ -15,6 +15,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ApiStripeWebhookRouteImport } from './routes/api.stripe-webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
+  id: '/api/stripe-webhook',
+  path: '/api/stripe-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,12 +79,27 @@ export interface FileRoutesById {
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/contact' | '/privacy' | '/returns' | '/shipping' | '/terms'
+  fullPaths:
+    | '/'
+    | '/contact'
+    | '/privacy'
+    | '/returns'
+    | '/shipping'
+    | '/terms'
+    | '/api/stripe-webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/contact' | '/privacy' | '/returns' | '/shipping' | '/terms'
+  to:
+    | '/'
+    | '/contact'
+    | '/privacy'
+    | '/returns'
+    | '/shipping'
+    | '/terms'
+    | '/api/stripe-webhook'
   id:
     | '__root__'
     | '/'
@@ -85,6 +108,7 @@ export interface FileRouteTypes {
     | '/returns'
     | '/shipping'
     | '/terms'
+    | '/api/stripe-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -94,6 +118,7 @@ export interface RootRouteChildren {
   ReturnsRoute: typeof ReturnsRoute
   ShippingRoute: typeof ShippingRoute
   TermsRoute: typeof TermsRoute
+  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -140,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/stripe-webhook': {
+      id: '/api/stripe-webhook'
+      path: '/api/stripe-webhook'
+      fullPath: '/api/stripe-webhook'
+      preLoaderRoute: typeof ApiStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -150,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReturnsRoute: ReturnsRoute,
   ShippingRoute: ShippingRoute,
   TermsRoute: TermsRoute,
+  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
