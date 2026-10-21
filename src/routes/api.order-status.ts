@@ -4,8 +4,9 @@ import { getStripeKey, loadOrder, orderStatus, sendMail, type ShipmentStatus } f
 // Sends a "shipped" / "delivered" email to the customer of an order.
 // POST https://www.kayanu.com/api/order-status
 //   Authorization: Bearer <ORDER_ADMIN_SECRET>
-//   { "sessionId": "cs_live_...", "status": "shipped", "carrier": "USPS",
+//   { "sessionId": "cs_live_...", "status": "shipped",
 //     "trackingNumber": "9400...", "trackingUrl": "https://..." }
+// (no carrier field: the email never names the carrier, see emails.server.ts)
 // Meant to be called from n8n (or any script) once the supplier gives tracking info.
 
 function safeEqual(a: string, b: string) {
@@ -47,7 +48,6 @@ export const Route = createFileRoute("/api/order-status")({
         try {
           const order = await loadOrder(sessionId);
           const mail = orderStatus(order, status as ShipmentStatus, {
-            carrier: str(body["carrier"]),
             trackingNumber: str(body["trackingNumber"]),
             trackingUrl: str(body["trackingUrl"]),
           });

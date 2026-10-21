@@ -8,6 +8,10 @@ const SUPPORT_EMAIL = "support@kayanu.com";
 const FROM_ORDERS = "KAYANU <orders@kayanu.com>";
 
 const C = { teal: "#0C3B3C", cream: "#FAF7F2", accent: "#E07856", muted: "#6B7F80", text: "#3D5A5B" };
+// Same typefaces as the site (Sora headings, Inter body), loaded from Google Fonts where the
+// mail client allows it (Apple Mail, iOS, many webmails); others fall back to Arial.
+const FONT_DISPLAY = "'Sora','Inter',Arial,Helvetica,sans-serif";
+const FONT_BODY = "'Inter',Arial,Helvetica,sans-serif";
 
 // ---------- helpers ----------
 
@@ -115,9 +119,20 @@ export async function loadOrder(sessionId: string): Promise<Order> {
 // ---------- layout ----------
 
 function layout(opts: { preheader: string; title: string; body: string; lang?: string; footer?: string }) {
+  const link = (label: string, href: string) =>
+    `<a href="${href}" style="color:${C.muted};text-decoration:underline;">${label}</a>`;
   const footer =
     opts.footer ??
-    `Questions? Reply to this email or write to <a href="mailto:${SUPPORT_EMAIL}" style="color:${C.muted};text-decoration:underline;">${SUPPORT_EMAIL}</a>.`;
+    [
+      `<span style="font-family:${FONT_DISPLAY};font-size:13px;letter-spacing:3px;font-weight:800;color:${C.teal};">KAYANU</span>`,
+      "Premium travel essentials. Pack more, stress less.",
+      `Questions or a return? Email ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`)} within 30 days of delivery.`,
+      [
+        link("Shipping", `${SITE}/shipping`),
+        link("Returns", `${SITE}/returns`),
+        link("Contact", `${SITE}/contact`),
+      ].join(" &middot; "),
+    ].join("<br>");
   return `<!DOCTYPE html>
 <html lang="${opts.lang ?? "en"}">
 <head>
@@ -125,19 +140,21 @@ function layout(opts: { preheader: string; title: string; body: string; lang?: s
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>${esc(opts.title)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
 </head>
 <body style="margin-top:0;margin-bottom:0;margin-left:0;margin-right:0;padding-top:0;padding-bottom:0;padding-left:0;padding-right:0;background-color:${C.cream};">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:${C.cream};">${esc(opts.preheader)}</div>
 <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.cream}" style="background-color:${C.cream};">
 <tr><td align="center" style="padding-top:24px;padding-bottom:24px;padding-left:12px;padding-right:12px;">
 <table width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
-<tr><td align="center" bgcolor="${C.teal}" style="background-color:${C.teal};padding-top:22px;padding-bottom:22px;padding-left:24px;padding-right:24px;">
-<a href="${SITE}" style="font-family:Arial,Helvetica,sans-serif;font-size:22px;line-height:28px;letter-spacing:6px;font-weight:bold;color:${C.cream};text-decoration:none;">KAYANU</a>
+<tr><td align="center" bgcolor="${C.teal}" style="background-color:${C.teal};border-radius:24px 24px 0 0;padding-top:24px;padding-bottom:24px;padding-left:24px;padding-right:24px;">
+<a href="${SITE}" style="font-family:${FONT_DISPLAY};font-size:22px;line-height:28px;letter-spacing:5px;font-weight:800;color:${C.cream};text-decoration:none;">KAYANU</a>
 </td></tr>
-<tr><td bgcolor="#FFFFFF" style="background-color:#FFFFFF;padding-top:36px;padding-bottom:32px;padding-left:36px;padding-right:36px;">
+<tr><td bgcolor="#FFFFFF" style="background-color:#FFFFFF;border-radius:0 0 24px 24px;border:1px solid #EFE9E0;border-top:0;box-shadow:0 10px 30px -12px rgba(12,59,60,0.25);padding-top:36px;padding-bottom:32px;padding-left:36px;padding-right:36px;">
+<p style="font-family:${FONT_BODY};font-size:12px;line-height:16px;letter-spacing:2.5px;font-weight:700;text-transform:uppercase;color:${C.accent};margin-top:0;margin-bottom:10px;">${esc(opts.title)}</p>
 ${opts.body}
 </td></tr>
-<tr><td align="center" style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:${C.muted};padding-top:20px;padding-bottom:8px;padding-left:24px;padding-right:24px;">${footer}</td></tr>
+<tr><td align="center" style="font-family:${FONT_BODY};font-size:12px;line-height:18px;color:${C.muted};padding-top:20px;padding-bottom:8px;padding-left:24px;padding-right:24px;">${footer}</td></tr>
 </table>
 </td></tr>
 </table>
@@ -146,23 +163,23 @@ ${opts.body}
 }
 
 const h1 = (t: string) =>
-  `<p style="font-family:Arial,Helvetica,sans-serif;font-size:26px;line-height:32px;font-weight:bold;color:${C.teal};margin-top:0;margin-bottom:14px;">${t}</p>`;
+  `<p style="font-family:${FONT_DISPLAY};font-size:26px;line-height:32px;font-weight:bold;color:${C.teal};margin-top:0;margin-bottom:14px;">${t}</p>`;
 const p = (t: string) =>
-  `<p style="font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:25px;color:${C.text};margin-top:0;margin-bottom:16px;">${t}</p>`;
+  `<p style="font-family:${FONT_BODY};font-size:16px;line-height:25px;color:${C.text};margin-top:0;margin-bottom:16px;">${t}</p>`;
 const small = (t: string) =>
-  `<p style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:${C.muted};margin-top:0;margin-bottom:8px;">${t}</p>`;
+  `<p style="font-family:${FONT_BODY};font-size:13px;line-height:20px;color:${C.muted};margin-top:0;margin-bottom:8px;">${t}</p>`;
 const button = (label: string, href: string) =>
-  `<table cellpadding="0" cellspacing="0" border="0" style="margin-top:8px;margin-bottom:20px;"><tr><td align="center" bgcolor="${C.teal}" style="background-color:${C.teal};border-radius:999px;"><a href="${esc(href)}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:20px;font-weight:bold;color:${C.cream};text-decoration:none;padding-top:15px;padding-bottom:15px;padding-left:32px;padding-right:32px;">${esc(label)}</a></td></tr></table>`;
+  `<table cellpadding="0" cellspacing="0" border="0" style="margin-top:8px;margin-bottom:20px;"><tr><td align="center" bgcolor="${C.teal}" style="background-color:${C.teal};border-radius:999px;"><a href="${esc(href)}" style="display:inline-block;font-family:${FONT_DISPLAY};font-size:16px;line-height:20px;font-weight:bold;color:${C.cream};text-decoration:none;padding-top:15px;padding-bottom:15px;padding-left:32px;padding-right:32px;">${esc(label)}</a></td></tr></table>`;
 
 function itemsTable(o: Order, withTotals: boolean) {
   const rows = o.items
     .map(
       (i) =>
-        `<tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:22px;color:${C.text};padding-top:10px;padding-bottom:10px;border-bottom:1px solid #EFE9E0;">${esc(i.name)} <span style="color:${C.muted};">&times; ${i.qty}</span></td><td align="right" style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:22px;color:${C.text};padding-top:10px;padding-bottom:10px;border-bottom:1px solid #EFE9E0;white-space:nowrap;">${money(i.amount, o.currency)}</td></tr>`,
+        `<tr><td style="font-family:${FONT_BODY};font-size:15px;line-height:22px;color:${C.text};padding-top:10px;padding-bottom:10px;border-bottom:1px solid #EFE9E0;">${esc(i.name)} <span style="color:${C.muted};">&times; ${i.qty}</span></td><td align="right" style="font-family:${FONT_BODY};font-size:15px;line-height:22px;color:${C.text};padding-top:10px;padding-bottom:10px;border-bottom:1px solid #EFE9E0;white-space:nowrap;">${money(i.amount, o.currency)}</td></tr>`,
     )
     .join("");
   const line = (label: string, value: string, bold = false) =>
-    `<tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:${bold ? 17 : 14}px;line-height:24px;color:${bold ? C.teal : C.muted};${bold ? "font-weight:bold;" : ""}padding-top:4px;">${label}</td><td align="right" style="font-family:Arial,Helvetica,sans-serif;font-size:${bold ? 17 : 14}px;line-height:24px;color:${bold ? C.teal : C.muted};${bold ? "font-weight:bold;" : ""}padding-top:4px;">${value}</td></tr>`;
+    `<tr><td style="font-family:${FONT_BODY};font-size:${bold ? 17 : 14}px;line-height:24px;color:${bold ? C.teal : C.muted};${bold ? "font-weight:bold;" : ""}padding-top:4px;">${label}</td><td align="right" style="font-family:${FONT_BODY};font-size:${bold ? 17 : 14}px;line-height:24px;color:${bold ? C.teal : C.muted};${bold ? "font-weight:bold;" : ""}padding-top:4px;">${value}</td></tr>`;
   const totals = withTotals
     ? `${line("Subtotal", money(o.subtotal, o.currency))}${line("Shipping", o.shipping ? money(o.shipping, o.currency) : "Free")}${o.tax ? line("Tax", money(o.tax, o.currency)) : ""}${line("Total", money(o.total, o.currency), true)}`
     : "";
@@ -171,7 +188,7 @@ function itemsTable(o: Order, withTotals: boolean) {
 
 const addressBlock = (o: Order, label = "Shipping to") =>
   o.address.length
-    ? `<p style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:18px;letter-spacing:1px;font-weight:bold;color:${C.accent};margin-top:8px;margin-bottom:6px;">${label.toUpperCase()}</p><p style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:23px;color:${C.text};margin-top:0;margin-bottom:20px;">${o.address.map(esc).join("<br>")}</p>`
+    ? `<p style="font-family:${FONT_BODY};font-size:13px;line-height:18px;letter-spacing:1px;font-weight:bold;color:${C.accent};margin-top:8px;margin-bottom:6px;">${label.toUpperCase()}</p><p style="font-family:${FONT_BODY};font-size:15px;line-height:23px;color:${C.text};margin-top:0;margin-bottom:20px;">${o.address.map(esc).join("<br>")}</p>`
     : "";
 
 // ---------- email builders ----------
@@ -183,7 +200,7 @@ export function orderConfirmation(o: Order): Mail | null {
   const first = o.name?.split(" ")[0];
   const body = [
     h1(`Thank you${first ? `, ${esc(first)}` : ""}!`),
-    p(`We've received your order <strong>${esc(o.number)}</strong> and it's being prepared at our U.S. warehouse.`),
+    p(`We've received your order <strong>${esc(o.number)}</strong> and it's being prepared for shipping.`),
     itemsTable(o, true),
     addressBlock(o),
     p(
@@ -227,8 +244,8 @@ export function ownerNewOrder(o: Order, to: string): Mail {
 }
 
 export type ShipmentStatus = "shipped" | "delivered";
+// The carrier is deliberately not shown: orders are fulfilled by suppliers and the carrier varies.
 export type Tracking = {
-  carrier?: string | undefined;
   trackingNumber?: string | undefined;
   trackingUrl?: string | undefined;
 };
@@ -237,12 +254,7 @@ export function orderStatus(o: Order, status: ShipmentStatus, t: Tracking): Mail
   if (!o.email) return null;
   const first = o.name?.split(" ")[0];
   const safeUrl = t.trackingUrl && /^https:\/\//i.test(t.trackingUrl) ? t.trackingUrl : undefined;
-  const trackingLines = [
-    t.carrier ? `Carrier: <strong>${esc(t.carrier)}</strong>` : "",
-    t.trackingNumber ? `Tracking number: <strong>${esc(t.trackingNumber)}</strong>` : "",
-  ]
-    .filter(Boolean)
-    .join("<br>");
+  const trackingLines = t.trackingNumber ? `Tracking number: <strong>${esc(t.trackingNumber)}</strong>` : "";
   const body =
     status === "shipped"
       ? [
@@ -256,7 +268,7 @@ export function orderStatus(o: Order, status: ShipmentStatus, t: Tracking): Mail
       : [
           h1("Your order was delivered"),
           p(`Order <strong>${esc(o.number)}</strong> has been delivered${first ? `, ${esc(first)}` : ""}. We hope you love your KAYANU cubes!`),
-          p(`If anything isn't right, just reply to this email &mdash; our 30-day happiness guarantee has you covered.`),
+          p(`If anything isn't right, email <a href="mailto:${SUPPORT_EMAIL}" style="color:${C.teal};font-weight:bold;">${SUPPORT_EMAIL}</a> within 30 days of delivery to start a return &mdash; our happiness guarantee has you covered.`),
           button("Shop KAYANU", SITE),
           itemsTable(o, false),
         ].join("");

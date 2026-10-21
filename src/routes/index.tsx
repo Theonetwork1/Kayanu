@@ -112,7 +112,7 @@ function Hero() {
           {(
             [
               [Check, "Quality-checked zippers"],
-              [Truck, "Ships from U.S. warehouse"],
+              [Truck, "Fast U.S. shipping"],
               [ShieldCheck, "30-day guarantee"],
             ] as [LucideIcon, string][]
           ).map(([I, t]) => (
@@ -510,8 +510,8 @@ function Faq() {
       </h2>
       <div className="reveal mt-8">
         <Accordion q="How long is shipping?">
-          Orders are processed in 1–2 business days, then delivered in 3–8 business days from our
-          U.S. warehouse. You'll receive tracking by email as soon as your order ships.
+          Orders are processed in 1–2 business days, then delivered in 3–8 business days anywhere in
+          the U.S. You'll receive tracking by email as soon as your order ships.
         </Accordion>
         <Accordion q="What's included?">
           Each set includes 8 compression cubes (2 XL, 2 Large, 2 Medium, 2 Small), plus a shoe

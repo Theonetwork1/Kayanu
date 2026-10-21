@@ -15,7 +15,7 @@ export const Route = createFileRoute("/shipping")({
       {
         name: "description",
         content:
-          "KAYANU ships from our U.S. warehouse: 1–2 day processing, 3–8 business day delivery, tracking on every order.",
+          "Fast U.S. shipping from KAYANU: 1–2 day processing, 3–8 business day delivery, tracking on every order.",
       },
       { property: "og:title", content: "Shipping Policy — KAYANU" },
       {
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/shipping")({
     <SiteShell>
       <PolicyPage title="Shipping Policy">
         <h2>Where we ship</h2>
-        <p>We currently ship to addresses within the United States from our U.S. warehouse.</p>
+        <p>We currently ship to addresses within the United States.</p>
         <h2>Processing time</h2>
         <p>Orders are processed within 1–2 business days (Monday–Friday, excluding holidays).</p>
         <h2>Delivery time</h2>
