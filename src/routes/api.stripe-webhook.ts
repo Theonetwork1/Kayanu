@@ -2,15 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import Stripe from "stripe";
 
 // Stripe webhook endpoint: POST https://kayanu.com/api/stripe-webhook
-// Env vars (set in Vercel): STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
+// Env var (set in Vercel): STRIPE_WEBHOOK_SECRET (KAYANU_WEBHOOK is accepted as an alias).
+// Signature verification only needs the webhook signing secret, not the API key.
 export const Route = createFileRoute("/api/stripe-webhook")({
   server: {
     handlers: {
       POST: async ({ request }: { request: Request }) => {
-        const secret = process.env.STRIPE_WEBHOOK_SECRET;
-        const apiKey = process.env.STRIPE_SECRET_KEY;
-        if (!secret || !apiKey) {
-          console.error("Stripe webhook: missing STRIPE_WEBHOOK_SECRET or STRIPE_SECRET_KEY");
+        const secret = process.env.STRIPE_WEBHOOK_SECRET ?? process.env.KAYANU_WEBHOOK;
+        if (!secret) {
+          console.error("Stripe webhook: missing STRIPE_WEBHOOK_SECRET (or KAYANU_WEBHOOK)");
           return new Response("Webhook not configured", { status: 500 });
         }
 
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/api/stripe-webhook")({
         if (!signature) return new Response("Missing stripe-signature", { status: 400 });
 
         const payload = await request.text(); // raw body is required for verification
-        const stripe = new Stripe(apiKey);
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "sk_unused_for_webhook_verification");
 
         let event: Stripe.Event;
         try {
