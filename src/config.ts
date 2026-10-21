@@ -24,8 +24,8 @@ export type ColorId = (typeof COLORS)[number]["id"];
 
 // Stripe payment links, one per variant. Replace "#" with real URLs.
 export const CHECKOUT_URLS: Record<VariantId, string> = {
-  "1-set": "#",
-  "2-sets": "#",
+  "1-set": "https://buy.stripe.com/28E3cugWP5npgyAc9Z1RC00",
+  "2-sets": "https://buy.stripe.com/5kQ6oGdKDg23dmogqf1RC01",
 };
 
 export const SHIPPING_FLAT = 4.95;
