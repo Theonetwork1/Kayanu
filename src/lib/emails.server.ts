@@ -309,6 +309,26 @@ export function abandonedCart(o: Order): Mail | null {
   };
 }
 
+/** Owner alert (French) when a paid order could not be sent to CJdropshipping automatically. */
+export function ownerCjManual(o: Order, reason: string, to: string, retrying = false): Mail {
+  const body = [
+    h1(retrying ? `Envoi à CJ en échec : ${esc(o.number)}` : `Commande ${esc(o.number)} à passer chez CJ`),
+    p(`La commande payée n'a pas pu être envoyée automatiquement à CJdropshipping.<br>Raison : <strong>${esc(reason)}</strong>`),
+    itemsTable(o, false),
+    addressBlock(o, "Adresse de livraison"),
+    retrying
+      ? p("Erreur temporaire : Stripe va renvoyer la commande automatiquement. Ne la passez pas à la main tout de suite ; si elle n'apparaît pas dans My CJ d'ici 24 h, passez-la manuellement.")
+      : p("Passez-la manuellement dans My CJ, puis corrigez la cause (voir <code>src/lib/cj-catalog.ts</code> et les variables CJ_* sur Vercel)."),
+    small(`ID de session Stripe : ${esc(o.sessionId)}`),
+  ].join("");
+  return {
+    to,
+    subject: `Action requise : commande ${o.number} non envoyée à CJ`,
+    html: layout({ preheader: reason, title: "Commande CJ", body, lang: "fr", footer: "Notification interne KAYANU" }),
+    idempotencyKey: `cj-manual/${o.sessionId}`,
+  };
+}
+
 /** Owner alert (French) when Resend reports that a customer email was not delivered. */
 export function ownerDeliveryProblem(
   p0: { event: string; to: string; subject: string; reason: string; emailId: string },

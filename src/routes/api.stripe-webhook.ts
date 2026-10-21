@@ -6,13 +6,16 @@ import {
   getWebhookSecret,
   loadOrder,
   orderConfirmation,
+  ownerCjManual,
   ownerNewOrder,
   sendMail,
 } from "@/lib/emails.server";
+import { placeCjOrder, type PlaceResult } from "@/lib/cj.server";
 
 // Stripe webhook endpoint: POST https://www.kayanu.com/api/stripe-webhook
 // Env vars (Vercel): STRIPE_WEBHOOK_SECRET (alias KAYANU_WEBHOOK), STRIPE_SECRET_KEY (alias KAYANU),
-// RESEND_API_KEY, ORDER_NOTIFY_EMAIL (where new-order alerts go).
+// RESEND_API_KEY, ORDER_NOTIFY_EMAIL (where new-order alerts go), and CJ_* (see cj.server.ts):
+// each paid session is also sent to CJdropshipping as an order.
 // Signature verification only needs the signing secret, not the API key.
 export const Route = createFileRoute("/api/stripe-webhook")({
   server: {
@@ -54,24 +57,43 @@ export const Route = createFileRoute("/api/stripe-webhook")({
 
         if (!isPaid && !isExpired) return ok();
 
+        const sessionId = (event.data.object as Stripe.Checkout.Session).id;
+
+        // Fulfillment first, so a failing email can't hold the order back. placeCjOrder
+        // never throws, and CJ rejects a second order with the same number when Stripe retries.
+        let cj: PlaceResult | undefined;
+        if (isPaid && getStripeKey()) {
+          cj = await placeCjOrder(sessionId);
+          console.log(
+            "CJ order:",
+            cj.status,
+            cj.sandbox ? "(sandbox)" : "(live)",
+            "reason" in cj ? cj.reason : (cj.cjOrderId ?? ""),
+          );
+        }
+        // A transient CJ failure is retried by Stripe once the emails are out.
+        const retryCj = cj?.status === "retry";
+
         // Missing configuration can't be fixed by a retry: log loudly and acknowledge,
         // otherwise Stripe would retry for days and then disable this endpoint.
         if (!process.env["RESEND_API_KEY"] || !getStripeKey()) {
           console.error(
             "Stripe webhook: emails skipped, set RESEND_API_KEY and STRIPE_SECRET_KEY in Vercel",
           );
-          return ok();
+          return retryCj ? new Response("CJ order failed, retry", { status: 500 }) : ok();
         }
 
         try {
-          const sessionId = (event.data.object as Stripe.Checkout.Session).id;
           const order = await loadOrder(sessionId);
 
           if (isPaid) {
             console.log("Order paid:", order.number, order.total);
+            const owner = process.env["ORDER_NOTIFY_EMAIL"];
+            if (owner && cj && (cj.status === "manual" || cj.status === "retry")) {
+              await sendMail(ownerCjManual(order, cj.reason, owner, cj.status === "retry"));
+            }
             const customerMail = orderConfirmation(order);
             if (customerMail) await sendMail(customerMail);
-            const owner = process.env["ORDER_NOTIFY_EMAIL"];
             if (owner) await sendMail(ownerNewOrder(order, owner));
             else console.warn("ORDER_NOTIFY_EMAIL not set: owner notification skipped");
           } else {
@@ -84,7 +106,7 @@ export const Route = createFileRoute("/api/stripe-webhook")({
           return new Response("Email step failed", { status: 500 });
         }
 
-        return ok();
+        return retryCj ? new Response("CJ order failed, retry", { status: 500 }) : ok();
       },
     },
   },
