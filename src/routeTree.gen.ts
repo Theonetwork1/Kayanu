@@ -15,6 +15,8 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ApiCjAdminRouteImport } from './routes/api.cj-admin'
+import { Route as ApiCjWebhookRouteImport } from './routes/api.cj-webhook'
 import { Route as ApiOrderStatusRouteImport } from './routes/api.order-status'
 import { Route as ApiResendWebhookRouteImport } from './routes/api.resend-webhook'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api.stripe-webhook'
@@ -49,6 +51,16 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCjAdminRoute = ApiCjAdminRouteImport.update({
+  id: '/api/cj-admin',
+  path: '/api/cj-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCjWebhookRoute = ApiCjWebhookRouteImport.update({
+  id: '/api/cj-webhook',
+  path: '/api/cj-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiOrderStatusRoute = ApiOrderStatusRouteImport.update({
   id: '/api/order-status',
   path: '/api/order-status',
@@ -72,6 +84,8 @@ export interface FileRoutesByFullPath {
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
+  '/api/cj-admin': typeof ApiCjAdminRoute
+  '/api/cj-webhook': typeof ApiCjWebhookRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/stripe-webhook': typeof ApiStripeWebhookRoute
@@ -83,6 +97,8 @@ export interface FileRoutesByTo {
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
+  '/api/cj-admin': typeof ApiCjAdminRoute
+  '/api/cj-webhook': typeof ApiCjWebhookRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/stripe-webhook': typeof ApiStripeWebhookRoute
@@ -95,6 +111,8 @@ export interface FileRoutesById {
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
+  '/api/cj-admin': typeof ApiCjAdminRoute
+  '/api/cj-webhook': typeof ApiCjWebhookRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/stripe-webhook': typeof ApiStripeWebhookRoute
@@ -108,6 +126,8 @@ export interface FileRouteTypes {
     | '/returns'
     | '/shipping'
     | '/terms'
+    | '/api/cj-admin'
+    | '/api/cj-webhook'
     | '/api/order-status'
     | '/api/resend-webhook'
     | '/api/stripe-webhook'
@@ -119,6 +139,8 @@ export interface FileRouteTypes {
     | '/returns'
     | '/shipping'
     | '/terms'
+    | '/api/cj-admin'
+    | '/api/cj-webhook'
     | '/api/order-status'
     | '/api/resend-webhook'
     | '/api/stripe-webhook'
@@ -130,6 +152,8 @@ export interface FileRouteTypes {
     | '/returns'
     | '/shipping'
     | '/terms'
+    | '/api/cj-admin'
+    | '/api/cj-webhook'
     | '/api/order-status'
     | '/api/resend-webhook'
     | '/api/stripe-webhook'
@@ -142,6 +166,8 @@ export interface RootRouteChildren {
   ReturnsRoute: typeof ReturnsRoute
   ShippingRoute: typeof ShippingRoute
   TermsRoute: typeof TermsRoute
+  ApiCjAdminRoute: typeof ApiCjAdminRoute
+  ApiCjWebhookRoute: typeof ApiCjWebhookRoute
   ApiOrderStatusRoute: typeof ApiOrderStatusRoute
   ApiResendWebhookRoute: typeof ApiResendWebhookRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
@@ -191,6 +217,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cj-admin': {
+      id: '/api/cj-admin'
+      path: '/api/cj-admin'
+      fullPath: '/api/cj-admin'
+      preLoaderRoute: typeof ApiCjAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cj-webhook': {
+      id: '/api/cj-webhook'
+      path: '/api/cj-webhook'
+      fullPath: '/api/cj-webhook'
+      preLoaderRoute: typeof ApiCjWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/order-status': {
       id: '/api/order-status'
       path: '/api/order-status'
@@ -222,6 +262,8 @@ const rootRouteChildren: RootRouteChildren = {
   ReturnsRoute: ReturnsRoute,
   ShippingRoute: ShippingRoute,
   TermsRoute: TermsRoute,
+  ApiCjAdminRoute: ApiCjAdminRoute,
+  ApiCjWebhookRoute: ApiCjWebhookRoute,
   ApiOrderStatusRoute: ApiOrderStatusRoute,
   ApiResendWebhookRoute: ApiResendWebhookRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
