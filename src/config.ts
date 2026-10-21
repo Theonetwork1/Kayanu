@@ -1,18 +1,41 @@
 // Central store configuration — change prices, colors and checkout links here only.
 export const STORE_NAME = "KAYANU";
 export const CONTACT_EMAIL = "support@kayanu.com";
+// Canonical domain: the Lovable preview (kayanu.lovable.app) points search engines here.
+export const SITE_URL = "https://www.kayanu.com";
+export const canonicalLink = (path: string) => ({ rel: "canonical", href: `${SITE_URL}${path}` });
 
 export type VariantId = "1-set" | "2-sets";
 
+// Each variant is sold through its own Stripe payment link. Color is picked again on
+// the Stripe page ("Set color" dropdown); quantity is fixed to 1 on the 1 Set link and
+// adjustable (1–10) on the 2 Sets link, so free shipping always matches the policy.
 export const VARIANTS: {
   id: VariantId;
   label: string;
+  includes: string;
   price: number;
   compareAt: number;
+  checkoutUrl: string;
   badge?: string;
 }[] = [
-  { id: "1-set", label: "1 Set", price: 29.99, compareAt: 39.99 },
-  { id: "2-sets", label: "2 Sets", price: 49.99, compareAt: 59.98, badge: "MOST POPULAR" },
+  {
+    id: "1-set",
+    label: "1 Set",
+    includes: "8 cubes + shoe pouch + laundry bag",
+    price: 29.99,
+    compareAt: 39.99,
+    checkoutUrl: "https://buy.stripe.com/dRm5kC57waGBcND87W3wQ00",
+  },
+  {
+    id: "2-sets",
+    label: "2 Sets",
+    includes: "16 cubes + 2 shoe pouches + 2 laundry bags · Free shipping",
+    price: 49.99,
+    compareAt: 59.98,
+    checkoutUrl: "https://buy.stripe.com/cNi28qgQe9Cx8xnag43wQ01",
+    badge: "MOST POPULAR",
+  },
 ];
 
 export const COLORS = [
@@ -22,15 +45,9 @@ export const COLORS = [
 ] as const;
 export type ColorId = (typeof COLORS)[number]["id"];
 
-// Stripe payment links, one per variant. Replace "#" with real URLs.
-export const CHECKOUT_URLS: Record<VariantId, string> = {
-  "1-set": "https://buy.stripe.com/dRm5kC57waGBcND87W3wQ00",
-  "2-sets": "https://buy.stripe.com/cNi28qgQe9Cx8xnag43wQ01",
-};
-
-
 // Add-on products (upsells) — each is sold through its own Stripe payment link.
-// The bundle link checks out the 1-Set + the vacuum bags in a single payment.
+// The kit link checks out the 1 Set + the vacuum bags in a single payment, with free
+// shipping and a set-color dropdown.
 export type Addon = {
   id: string;
   name: string;
@@ -45,11 +62,11 @@ export const ADDONS: Addon[] = [
     id: "kit-set-vacuum",
     name: "The Complete Kit — Set + Vacuum Bags",
     tagline:
-      "The 8-piece set plus the 12 vacuum bags in one checkout — and at $49.98 it clears the free-shipping threshold.",
+      "The 8-piece set plus the 12 vacuum bags in one checkout — and at $49.98 it ships free.",
     price: 49.98,
     image: "https://s.alicdn.com/@sc04/kf/H98ada98627f3418784ac2191c9f120b0R.jpg",
     checkoutUrl: "https://buy.stripe.com/00w5kCczY6qlbJz0Fu3wQ04",
-    badge: "BEST VALUE",
+    badge: "SHIPS FREE",
   },
   {
     id: "vacuum-bags",
@@ -70,6 +87,11 @@ export const ADDONS: Addon[] = [
     checkoutUrl: "https://buy.stripe.com/3cI8wO57wdSNaFv1Jy3wQ03",
   },
 ];
+
+// Welcome discount shown on the home page. Leave null until the code exists as an
+// active Promotion Code in Stripe (the payment links already accept promotion codes);
+// while null, the offer is hidden so the site never promises a code that fails.
+export const WELCOME_CODE: string | null = null;
 
 export const SHIPPING_FLAT = 4.95;
 export const FREE_SHIPPING_THRESHOLD = 49;

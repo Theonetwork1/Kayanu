@@ -17,6 +17,8 @@ import {
 export const Route = createFileRoute("/api/stripe-webhook")({
   server: {
     handlers: {
+      // Without this, a browser visit renders the home page with a 200.
+      GET: () => new Response("Method Not Allowed", { status: 405, headers: { allow: "POST" } }),
       POST: async ({ request }: { request: Request }) => {
         const secret = getWebhookSecret();
         if (!secret) {
@@ -55,7 +57,9 @@ export const Route = createFileRoute("/api/stripe-webhook")({
         // Missing configuration can't be fixed by a retry: log loudly and acknowledge,
         // otherwise Stripe would retry for days and then disable this endpoint.
         if (!process.env["RESEND_API_KEY"] || !getStripeKey()) {
-          console.error("Stripe webhook: emails skipped, set RESEND_API_KEY and STRIPE_SECRET_KEY in Vercel");
+          console.error(
+            "Stripe webhook: emails skipped, set RESEND_API_KEY and STRIPE_SECRET_KEY in Vercel",
+          );
           return ok();
         }
 
