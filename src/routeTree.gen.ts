@@ -16,6 +16,7 @@ import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiOrderStatusRouteImport } from './routes/api.order-status'
+import { Route as ApiResendWebhookRouteImport } from './routes/api.resend-webhook'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api.stripe-webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +54,11 @@ const ApiOrderStatusRoute = ApiOrderStatusRouteImport.update({
   path: '/api/order-status',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiResendWebhookRoute = ApiResendWebhookRouteImport.update({
+  id: '/api/resend-webhook',
+  path: '/api/resend-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
   id: '/api/stripe-webhook',
   path: '/api/stripe-webhook',
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
   '/api/order-status': typeof ApiOrderStatusRoute
+  '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/stripe-webhook': typeof ApiStripeWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +84,7 @@ export interface FileRoutesByTo {
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
   '/api/order-status': typeof ApiOrderStatusRoute
+  '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/stripe-webhook': typeof ApiStripeWebhookRoute
 }
 export interface FileRoutesById {
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
   '/api/order-status': typeof ApiOrderStatusRoute
+  '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/stripe-webhook': typeof ApiStripeWebhookRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/shipping'
     | '/terms'
     | '/api/order-status'
+    | '/api/resend-webhook'
     | '/api/stripe-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/shipping'
     | '/terms'
     | '/api/order-status'
+    | '/api/resend-webhook'
     | '/api/stripe-webhook'
   id:
     | '__root__'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/shipping'
     | '/terms'
     | '/api/order-status'
+    | '/api/resend-webhook'
     | '/api/stripe-webhook'
   fileRoutesById: FileRoutesById
 }
@@ -131,6 +143,7 @@ export interface RootRouteChildren {
   ShippingRoute: typeof ShippingRoute
   TermsRoute: typeof TermsRoute
   ApiOrderStatusRoute: typeof ApiOrderStatusRoute
+  ApiResendWebhookRoute: typeof ApiResendWebhookRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
 }
 
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiOrderStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/resend-webhook': {
+      id: '/api/resend-webhook'
+      path: '/api/resend-webhook'
+      fullPath: '/api/resend-webhook'
+      preLoaderRoute: typeof ApiResendWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/stripe-webhook': {
       id: '/api/stripe-webhook'
       path: '/api/stripe-webhook'
@@ -203,6 +223,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShippingRoute: ShippingRoute,
   TermsRoute: TermsRoute,
   ApiOrderStatusRoute: ApiOrderStatusRoute,
+  ApiResendWebhookRoute: ApiResendWebhookRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
 }
 export const routeTree = rootRouteImport
