@@ -45,55 +45,68 @@ describe("buildCjOrder", () => {
     ],
   };
   const vacuum = CJ_PRODUCTS["prod_VTzj7CDzYr5gR2"]!.components[0]!;
-  const configure = () => {
-    CJ_SET_VIDS.sand = "VID-SET-SAND";
-    if (vacuum.kind === "fixed") vacuum.vid = "VID-VACUUM";
-    CJ_SHIPPING.logisticName = "USPS+";
-    CJ_SHIPPING.fromCountryCode = "US";
+  const saved = {
+    sand: CJ_SET_VIDS.sand,
+    vacuumVid: vacuum.kind === "fixed" ? vacuum.vid : null,
+    shipping: { ...CJ_SHIPPING },
   };
   afterEach(() => {
-    CJ_SET_VIDS.sand = null;
-    if (vacuum.kind === "fixed") vacuum.vid = null;
-    CJ_SHIPPING.logisticName = null;
-    CJ_SHIPPING.fromCountryCode = null;
+    CJ_SET_VIDS.sand = saved.sand;
+    if (vacuum.kind === "fixed") vacuum.vid = saved.vacuumVid;
+    Object.assign(CJ_SHIPPING, saved.shipping);
   });
 
-  it("refuses to build while the catalog is not configured", () => {
+  it("every Stripe product and set color has a CJ variant, and a shipping method is set", () => {
+    expect(Object.values(CJ_SET_VIDS).every(Boolean)).toBe(true);
+    for (const p of Object.values(CJ_PRODUCTS)) {
+      for (const c of p.components) if (c.kind === "fixed") expect(c.vid, p.label).toBeTruthy();
+    }
+    expect(CJ_SHIPPING.logisticName && CJ_SHIPPING.fromCountryCode).toBeTruthy();
+    // The vacuum pack is advertised as 12 bags.
+    const bags = CJ_PRODUCTS["prod_VTzj7CDzYr5gR2"]!.components.reduce((n, c) => n + c.qty, 0);
+    expect(bags).toBe(12);
+  });
+
+  it("refuses to build when a variant or the shipping method is missing", () => {
+    CJ_SHIPPING.logisticName = null;
     expect(buildCjOrder(session, { sandbox: true, autoPay: false })).toEqual({
       ok: false,
       reason: "CJ_SHIPPING (logisticName / fromCountryCode) is not set in cj-catalog.ts",
     });
-    CJ_SHIPPING.logisticName = "USPS+";
-    CJ_SHIPPING.fromCountryCode = "US";
+    Object.assign(CJ_SHIPPING, saved.shipping);
+    CJ_SET_VIDS.sand = null;
     const r = buildCjOrder(session, { sandbox: true, autoPay: false });
     expect(r.ok).toBe(false);
     expect(!r.ok && r.reason).toContain("CJ vid not set");
   });
 
   it("maps Stripe products and the set color to CJ variants and quantities", () => {
-    configure();
     const r = buildCjOrder(session, { sandbox: true, autoPay: false });
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.body.products).toEqual([
-      { vid: "VID-SET-SAND", quantity: 3 }, // 2 Sets + 1 Set, same color
-      { vid: "VID-VACUUM", quantity: 1 },
+      { vid: CJ_SET_VIDS.sand, quantity: 3 }, // 2 Sets + 1 Set, same color
+      { vid: "2608260124491617600", quantity: 4 }, // vacuum bags, 3 sizes × 4
+      { vid: "2608260124491617602", quantity: 4 },
+      { vid: "2608260124491617603", quantity: 4 },
     ]);
     expect(r.body).toMatchObject({
       orderNumber: "pi_3TestABC",
       shippingCountryCode: "US",
       shippingCountry: "United States",
       shippingProvince: "TX",
-      logisticName: "USPS+",
-      fromCountryCode: "US",
+      logisticName: CJ_SHIPPING.logisticName,
+      fromCountryCode: CJ_SHIPPING.fromCountryCode,
       isSandbox: 1,
       payType: 3,
     });
-    expect(buildCjOrder(session, { sandbox: false, autoPay: true }).ok && true).toBe(true);
+    expect(buildCjOrder(session, { sandbox: false, autoPay: true })).toMatchObject({
+      ok: true,
+      body: { isSandbox: 0, payType: 2 },
+    });
   });
 
   it("refuses unknown products, colors and incomplete addresses", () => {
-    configure();
     expect(buildCjOrder({ ...session, color: "red" }, { sandbox: true, autoPay: false }).ok).toBe(
       false,
     );
