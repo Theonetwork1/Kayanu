@@ -24,8 +24,8 @@ export type ColorId = (typeof COLORS)[number]["id"];
 
 // Stripe payment links, one per variant. Replace "#" with real URLs.
 export const CHECKOUT_URLS: Record<VariantId, string> = {
-  "1-set": "https://buy.stripe.com/28E3cugWP5npgyAc9Z1RC00",
-  "2-sets": "https://buy.stripe.com/5kQ6oGdKDg23dmogqf1RC01",
+  "1-set": "https://buy.stripe.com/dRm5kC57waGBcND87W3wQ00",
+  "2-sets": "https://buy.stripe.com/cNi28qgQe9Cx8xnag43wQ01",
 };
 
 
@@ -48,7 +48,7 @@ export const ADDONS: Addon[] = [
       "The 8-piece set plus the 12 vacuum bags in one checkout — and at $49.98 it clears the free-shipping threshold.",
     price: 49.98,
     image: "https://s.alicdn.com/@sc04/kf/H98ada98627f3418784ac2191c9f120b0R.jpg",
-    checkoutUrl: "https://buy.stripe.com/5kQbJ04a39DF6Y0a1R1RC06",
+    checkoutUrl: "https://buy.stripe.com/00w5kCczY6qlbJz0Fu3wQ04",
     badge: "BEST VALUE",
   },
   {
@@ -58,7 +58,7 @@ export const ADDONS: Addon[] = [
       "For the bulky stuff cubes can't tame — sweaters, jackets, coats. Roll the air out; no vacuum cleaner needed.",
     price: 19.99,
     image: "https://s.alicdn.com/@sc04/kf/Hf089375455364446bca22cbbd3ee3660q.jpg",
-    checkoutUrl: "https://buy.stripe.com/9B66oG0XR2bdcikc9Z1RC04",
+    checkoutUrl: "https://buy.stripe.com/00w4gyfMa7up4h74VK3wQ02",
   },
   {
     id: "toiletry-xl",
@@ -67,7 +67,7 @@ export const ADDONS: Addon[] = [
       "Hangs from any hook — built for cruise cabins and tiny bathrooms with no counter space. Every bottle in its place.",
     price: 24.99,
     image: "https://s.alicdn.com/@sc04/kf/Hae2fe615a8de4e938e76ff78839e06aaf.jpg",
-    checkoutUrl: "https://buy.stripe.com/5kQ3cu6ib0354PS8XN1RC05",
+    checkoutUrl: "https://buy.stripe.com/3cI8wO57wdSNaFv1Jy3wQ03",
   },
 ];
 
