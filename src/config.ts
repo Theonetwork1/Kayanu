@@ -22,35 +22,21 @@ export const COLORS = [
 ] as const;
 export type ColorId = (typeof COLORS)[number]["id"];
 
-// Stripe payment links, one per variant. Replace "#" with real URLs.
-export const CHECKOUT_URLS: Record<VariantId, string> = {
-  "1-set": "https://buy.stripe.com/dRm5kC57waGBcND87W3wQ00",
-  "2-sets": "https://buy.stripe.com/cNi28qgQe9Cx8xnag43wQ01",
-};
+// Cart checkout: the whole cart (variants, colors, quantities, shipping) is sent to a
+// Stripe Checkout Session created server-side in src/lib/checkout.ts, priced from the
+// values above. It needs the STRIPE_SECRET_KEY secret; no payment links are used.
 
-
-// Add-on products (upsells) — each is sold through its own Stripe payment link.
-// The bundle link checks out the 1-Set + the vacuum bags in a single payment.
+// Add-on products (upsells). They go in the cart like the set and are paid in the
+// same Stripe Checkout Session.
+export type AddonId = "vacuum-bags" | "toiletry-xl";
 export type Addon = {
-  id: string;
+  id: AddonId;
   name: string;
   tagline: string;
   price: number;
   image: string;
-  checkoutUrl: string;
-  badge?: string;
 };
 export const ADDONS: Addon[] = [
-  {
-    id: "kit-set-vacuum",
-    name: "The Complete Kit — Set + Vacuum Bags",
-    tagline:
-      "The 8-piece set plus the 12 vacuum bags in one checkout — and at $49.98 it clears the free-shipping threshold.",
-    price: 49.98,
-    image: "https://s.alicdn.com/@sc04/kf/H98ada98627f3418784ac2191c9f120b0R.jpg",
-    checkoutUrl: "https://buy.stripe.com/00w5kCczY6qlbJz0Fu3wQ04",
-    badge: "BEST VALUE",
-  },
   {
     id: "vacuum-bags",
     name: "Vacuum Travel Bags — 12 Pack",
@@ -58,7 +44,6 @@ export const ADDONS: Addon[] = [
       "For the bulky stuff cubes can't tame — sweaters, jackets, coats. Roll the air out; no vacuum cleaner needed.",
     price: 19.99,
     image: "https://s.alicdn.com/@sc04/kf/Hf089375455364446bca22cbbd3ee3660q.jpg",
-    checkoutUrl: "https://buy.stripe.com/00w4gyfMa7up4h74VK3wQ02",
   },
   {
     id: "toiletry-xl",
@@ -67,12 +52,27 @@ export const ADDONS: Addon[] = [
       "Hangs from any hook — built for cruise cabins and tiny bathrooms with no counter space. Every bottle in its place.",
     price: 24.99,
     image: "https://s.alicdn.com/@sc04/kf/Hae2fe615a8de4e938e76ff78839e06aaf.jpg",
-    checkoutUrl: "https://buy.stripe.com/3cI8wO57wdSNaFv1Jy3wQ03",
   },
 ];
+
+// The Complete Kit card adds 1 Set (in the chosen color) + this add-on to the cart.
+export const KIT = {
+  name: "The Complete Kit — Set + Vacuum Bags",
+  tagline:
+    "The 8-piece set plus the 12 vacuum bags — together they clear the free-shipping threshold.",
+  image: "https://s.alicdn.com/@sc04/kf/H98ada98627f3418784ac2191c9f120b0R.jpg",
+  badge: "SHIPS FREE",
+  variant: "1-set" as VariantId,
+  addon: "vacuum-bags" as AddonId,
+};
+
+// Code shown after the email sign-up. It must exist as a Promotion Code in Stripe
+// (Products → Coupons) or customers will get "invalid code" at checkout.
+export const WELCOME_CODE = "WELCOME10";
 
 export const SHIPPING_FLAT = 4.95;
 export const FREE_SHIPPING_THRESHOLD = 49;
 
 export const getVariant = (id: VariantId) => VARIANTS.find((v) => v.id === id)!;
+export const getAddon = (id: AddonId) => ADDONS.find((a) => a.id === id)!;
 export const formatPrice = (n: number) => `$${n.toFixed(2)}`;
