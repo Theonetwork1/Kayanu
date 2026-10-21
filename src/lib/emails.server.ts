@@ -126,7 +126,7 @@ function layout(opts: { preheader: string; title: string; body: string; lang?: s
     [
       `<span style="font-family:${FONT_DISPLAY};font-size:13px;letter-spacing:3px;font-weight:800;color:${C.teal};">KAYANU</span>`,
       "Premium travel essentials. Pack more, stress less.",
-      `Questions? Reply to this email or write to ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`)}.`,
+      `Questions or a return? Email ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`)} within 30 days of delivery.`,
       [
         link("Shipping", `${SITE}/shipping`),
         link("Returns", `${SITE}/returns`),
@@ -244,8 +244,8 @@ export function ownerNewOrder(o: Order, to: string): Mail {
 }
 
 export type ShipmentStatus = "shipped" | "delivered";
+// The carrier is deliberately not shown: orders are fulfilled by suppliers and the carrier varies.
 export type Tracking = {
-  carrier?: string | undefined;
   trackingNumber?: string | undefined;
   trackingUrl?: string | undefined;
 };
@@ -254,12 +254,7 @@ export function orderStatus(o: Order, status: ShipmentStatus, t: Tracking): Mail
   if (!o.email) return null;
   const first = o.name?.split(" ")[0];
   const safeUrl = t.trackingUrl && /^https:\/\//i.test(t.trackingUrl) ? t.trackingUrl : undefined;
-  const trackingLines = [
-    t.carrier ? `Carrier: <strong>${esc(t.carrier)}</strong>` : "",
-    t.trackingNumber ? `Tracking number: <strong>${esc(t.trackingNumber)}</strong>` : "",
-  ]
-    .filter(Boolean)
-    .join("<br>");
+  const trackingLines = t.trackingNumber ? `Tracking number: <strong>${esc(t.trackingNumber)}</strong>` : "";
   const body =
     status === "shipped"
       ? [
@@ -273,7 +268,7 @@ export function orderStatus(o: Order, status: ShipmentStatus, t: Tracking): Mail
       : [
           h1("Your order was delivered"),
           p(`Order <strong>${esc(o.number)}</strong> has been delivered${first ? `, ${esc(first)}` : ""}. We hope you love your KAYANU cubes!`),
-          p(`If anything isn't right, just reply to this email &mdash; our 30-day happiness guarantee has you covered.`),
+          p(`If anything isn't right, email <a href="mailto:${SUPPORT_EMAIL}" style="color:${C.teal};font-weight:bold;">${SUPPORT_EMAIL}</a> within 30 days of delivery to start a return &mdash; our happiness guarantee has you covered.`),
           button("Shop KAYANU", SITE),
           itemsTable(o, false),
         ].join("");

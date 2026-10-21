@@ -29,16 +29,28 @@ export const Route = createFileRoute("/returns")({
           full refund.
         </p>
         <h2>How to start a return</h2>
-        <p>
-          Email{" "}
-          <a className="text-accent underline" href={`mailto:${CONTACT_EMAIL}`}>
+        {/* Returns are handled by email only; the return address is sent with the instructions. */}
+        <p className="card-soft p-5 text-foreground">
+          Returns contact:{" "}
+          <a
+            className="font-semibold text-accent underline"
+            href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Return request")}`}
+          >
             {CONTACT_EMAIL}
-          </a>{" "}
-          with your order number and reason for return. We'll reply with return instructions.
+          </a>
+        </p>
+        <p>
+          Email us within 30 days of delivery with your order number and the reason for your return.
+          Please don't send anything back before we reply: we'll email you the return instructions
+          for your order.
         </p>
         <h2>Damaged or defective items</h2>
         <p>
-          If a zipper or any part of your set fails, contact us and we'll replace it or refund you.
+          If a zipper or any part of your set fails, email{" "}
+          <a className="text-accent underline" href={`mailto:${CONTACT_EMAIL}`}>
+            {CONTACT_EMAIL}
+          </a>{" "}
+          (a photo helps) and we'll replace it or refund you.
         </p>
         <h2>Refund timing</h2>
         <p>
