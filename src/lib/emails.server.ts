@@ -297,6 +297,29 @@ export function abandonedCart(o: Order): Mail | null {
   };
 }
 
+/** Owner alert (French) when Resend reports that a customer email was not delivered. */
+export function ownerDeliveryProblem(
+  p0: { event: string; to: string; subject: string; reason: string; emailId: string },
+  ownerTo: string,
+  eventId: string,
+): Mail {
+  const label =
+    p0.event === "email.bounced" ? "rejeté (bounce)" : p0.event === "email.complained" ? "signalé comme spam" : "non envoyé";
+  const body = [
+    h1(`E-mail client ${label}`),
+    p(`Destinataire : <strong>${esc(p0.to || "inconnu")}</strong><br>Objet : ${esc(p0.subject || "—")}`),
+    p(`Raison : ${esc(p0.reason)}`),
+    p("Le client n'a pas reçu cet e-mail. Vérifiez l'adresse dans Stripe et contactez-le par un autre moyen si besoin."),
+    button("Voir l'e-mail dans Resend", `https://resend.com/emails/${encodeURIComponent(p0.emailId)}`),
+  ].join("");
+  return {
+    to: ownerTo,
+    subject: `E-mail client ${label} — ${p0.to || "destinataire inconnu"}`,
+    html: layout({ preheader: p0.reason, title: "Problème de livraison", body, lang: "fr", footer: "Notification interne KAYANU" }),
+    idempotencyKey: `resend-alert/${eventId}`,
+  };
+}
+
 // ---------- sending ----------
 
 export async function sendMail(m: Mail): Promise<void> {
