@@ -28,6 +28,49 @@ export const CHECKOUT_URLS: Record<VariantId, string> = {
   "2-sets": "https://buy.stripe.com/5kQ6oGdKDg23dmogqf1RC01",
 };
 
+
+// Add-on products (upsells) — each is sold through its own Stripe payment link.
+// The bundle link checks out the 1-Set + the vacuum bags in a single payment.
+export type Addon = {
+  id: string;
+  name: string;
+  tagline: string;
+  price: number;
+  image: string;
+  checkoutUrl: string;
+  badge?: string;
+};
+export const ADDONS: Addon[] = [
+  {
+    id: "kit-set-vacuum",
+    name: "The Complete Kit — Set + Vacuum Bags",
+    tagline:
+      "The 8-piece set plus the 12 vacuum bags in one checkout — and at $49.98 it clears the free-shipping threshold.",
+    price: 49.98,
+    image: "https://s.alicdn.com/@sc04/kf/H98ada98627f3418784ac2191c9f120b0R.jpg",
+    checkoutUrl: "https://buy.stripe.com/5kQbJ04a39DF6Y0a1R1RC06",
+    badge: "BEST VALUE",
+  },
+  {
+    id: "vacuum-bags",
+    name: "Vacuum Travel Bags — 12 Pack",
+    tagline:
+      "For the bulky stuff cubes can't tame — sweaters, jackets, coats. Roll the air out; no vacuum cleaner needed.",
+    price: 19.99,
+    image: "https://s.alicdn.com/@sc04/kf/Hf089375455364446bca22cbbd3ee3660q.jpg",
+    checkoutUrl: "https://buy.stripe.com/9B66oG0XR2bdcikc9Z1RC04",
+  },
+  {
+    id: "toiletry-xl",
+    name: "Hanging Toiletry Bag — XL",
+    tagline:
+      "Hangs from any hook — built for cruise cabins and tiny bathrooms with no counter space. Every bottle in its place.",
+    price: 24.99,
+    image: "https://s.alicdn.com/@sc04/kf/Hae2fe615a8de4e938e76ff78839e06aaf.jpg",
+    checkoutUrl: "https://buy.stripe.com/5kQ3cu6ib0354PS8XN1RC05",
+  },
+];
+
 export const SHIPPING_FLAT = 4.95;
 export const FREE_SHIPPING_THRESHOLD = 49;
 

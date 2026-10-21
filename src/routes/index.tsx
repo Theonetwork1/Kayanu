@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Check, ShieldCheck, Truck, Package, Minus, Plus, X, Layers, Wind, Shirt, ChevronDown } from "lucide-react";
 import { SiteShell, useReveal } from "@/components/Layout";
 import { useCart } from "@/lib/cart";
-import { COLORS, VARIANTS, formatPrice, getVariant, type ColorId, type VariantId } from "@/config";
+import { ADDONS, COLORS, VARIANTS, formatPrice, getVariant, type ColorId, type VariantId } from "@/config";
 const heroImg = "https://s.alicdn.com/@sc04/kf/H98ada98627f3418784ac2191c9f120b0R.jpg"; // Authentic supplier photo — Shenzhen Yumi 8-pc compression set (composition cible)
 const flatlayImg = "https://s.alicdn.com/@sc04/kf/H88755db5b1d64dfd8cda54d16e9559c88.jpg"; // Authentic supplier photo — charcoal compression cubes lineup
 const compressImg = "https://s.alicdn.com/@sc04/kf/He37eee519eb344c2a9c3a13c32dbeff9I.jpg"; // Authentic supplier photo — beige compression cubes, lifestyle
@@ -50,6 +50,7 @@ function Home() {
       <HowItWorks />
       <Inside />
       <Buy />
+      <CompleteKit />
       <Comparison />
       <Guarantee />
       <Faq />
@@ -235,6 +236,43 @@ function Buy() {
           <Accordion q="Materials">Lightweight, water-resistant ripstop nylon with smooth double zippers and a carry handle on each cube.</Accordion>
           <Accordion q="Care">Hand wash or machine wash cold on a gentle cycle in a laundry bag. Air dry. Do not iron or bleach.</Accordion>
           <Accordion q="Dimensions">Four graduated sizes designed to fit carry-on and checked luggage. Mix and match to fill any suitcase.</Accordion>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CompleteKit() {
+  return (
+    <section id="complete-kit" className="scroll-mt-28 py-20">
+      <div className="mx-auto max-w-6xl px-5">
+        <div className="reveal text-center">
+          <Eyebrow>Complete your kit</Eyebrow>
+          <h2 className="text-3xl font-extrabold sm:text-4xl">More room. Zero chaos.</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
+            The add-ons travelers pair with the set. The Complete Kit is a single checkout; solo add-ons check out
+            separately. Everything ships in 3–8 business days.
+          </p>
+        </div>
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {ADDONS.map((a) => (
+            <div key={a.id} className="reveal flex flex-col overflow-hidden rounded-3xl bg-secondary shadow-[var(--shadow-soft)]">
+              <img src={a.image} alt={a.name} loading="lazy" className="aspect-[4/3] w-full object-cover" />
+              <div className="flex flex-1 flex-col p-6">
+                {a.badge ? (
+                  <span className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">{a.badge}</span>
+                ) : null}
+                <h3 className="font-bold">{a.name}</h3>
+                <p className="mt-2 flex-1 text-sm text-muted-foreground">{a.tagline}</p>
+                <div className="mt-5 flex items-center justify-between">
+                  <span className="text-xl font-extrabold">{formatPrice(a.price)}</span>
+                  <a href={a.checkoutUrl} className="btn-primary">
+                    Add
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
