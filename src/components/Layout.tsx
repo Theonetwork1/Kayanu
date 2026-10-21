@@ -58,7 +58,9 @@ function CartDrawer() {
   const remaining = FREE_SHIPPING_THRESHOLD - subtotal;
   const checkout = () => {
     if (!lines.length) return;
-    const url = CHECKOUT_URLS[lines[lines.length - 1].variant];
+    const last = lines[lines.length - 1];
+    if (!last) return;
+    const url = CHECKOUT_URLS[last.variant];
     window.location.href = url;
   };
   return (
