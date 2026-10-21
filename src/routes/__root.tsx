@@ -78,19 +78,48 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "theme-color", content: "#0C3B3C" },
       { title: "KAYANU — Compression Packing Cubes | Pack More, Stress Less" },
       {
         name: "description",
         content: "Premium compression packing cubes from KAYANU. Pack more, stress less.",
       },
       { property: "og:site_name", content: "KAYANU" },
+      { property: "og:locale", content: "en_US" },
+      {
+        "script:ld+json": {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "KAYANU",
+          url: "https://www.kayanu.com",
+          logo: "https://www.kayanu.com/favicon.svg",
+          email: "support@kayanu.com",
+          contactPoint: {
+            "@type": "ContactPoint",
+            contactType: "customer support",
+            email: "support@kayanu.com",
+            areaServed: "US",
+            availableLanguage: "English",
+          },
+        },
+      },
+      {
+        "script:ld+json": {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "KAYANU",
+          url: "https://www.kayanu.com",
+        },
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      // Product photos are served from alicdn: open the connection early for the hero image.
+      { rel: "preconnect", href: "https://s.alicdn.com" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap",

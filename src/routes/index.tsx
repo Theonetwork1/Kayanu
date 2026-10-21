@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Check,
   ShieldCheck,
@@ -25,14 +25,92 @@ import {
   type VariantId,
 } from "@/config";
 import type { LucideIcon } from "lucide-react";
+import { imageAt, responsiveImage } from "@/lib/images";
 // Supplier photos: replace with your own hosted images when available.
 const heroImg = "https://s.alicdn.com/@sc04/kf/H98ada98627f3418784ac2191c9f120b0R.jpg"; // 8-piece compression set
 const flatlayImg = "https://s.alicdn.com/@sc04/kf/H88755db5b1d64dfd8cda54d16e9559c88.jpg"; // charcoal cubes lineup
 const compressImg = "https://s.alicdn.com/@sc04/kf/He37eee519eb344c2a9c3a13c32dbeff9I.jpg"; // beige cubes, lifestyle
 
-const TITLE = "KAYANU — Compression Packing Cubes | Pack More, Stress Less";
+const TITLE = "Compression Packing Cubes — 8-Piece Travel Set | KAYANU";
 const DESC =
-  "KAYANU 8-piece compression packing cube set with shoe pouch and laundry bag. Fits carry-on and checked luggage. Fast U.S. shipping, 30-day guarantee.";
+  "Pack twice as much: 8 compression packing cubes plus a shoe pouch and laundry bag. Fits carry-on and checked luggage. Free U.S. shipping over $49, 30-day returns.";
+const PRODUCT_NAME = "KAYANU 8-Piece Compression Packing Cube Set";
+
+const FAQ: [string, string][] = [
+  [
+    "How long is shipping?",
+    "Orders are processed in 1–2 business days, then delivered in 3–8 business days anywhere in the U.S. You'll receive tracking by email as soon as your order ships.",
+  ],
+  [
+    "What's included?",
+    "Each set includes 8 compression cubes (2 XL, 2 Large, 2 Medium, 2 Small), plus a shoe pouch and a laundry bag.",
+  ],
+  [
+    "Will the set fit a carry-on?",
+    "Yes. The graduated sizes fit carry-on and checked luggage — use the smaller cubes for a carry-on and the full set for checked bags.",
+  ],
+  [
+    "How does compression work?",
+    "Pack the cube and close the main zipper. Then close the second compression zipper around the edge — it pulls the cube flatter and pushes out the air.",
+  ],
+  [
+    "What if a zipper breaks?",
+    "Every zipper is quality-checked before shipping. If one fails, contact us and we'll replace it or refund you.",
+  ],
+  [
+    "What is your return policy?",
+    "You have 30 days from delivery to return your order for a full refund.",
+  ],
+];
+
+// Structured data for Google rich results (price, availability, shipping and returns;
+// FAQ). Mirrors the visible page and config.ts: no ratings, nothing invented.
+const shippingDetails = (price: number) => ({
+  "@type": "OfferShippingDetails",
+  shippingRate: { "@type": "MonetaryAmount", value: price >= 49 ? 0 : 4.95, currency: "USD" },
+  shippingDestination: { "@type": "DefinedRegion", addressCountry: "US" },
+  deliveryTime: {
+    "@type": "ShippingDeliveryTime",
+    handlingTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 2, unitCode: "DAY" },
+    transitTime: { "@type": "QuantitativeValue", minValue: 3, maxValue: 8, unitCode: "DAY" },
+  },
+});
+const returnPolicy = {
+  "@type": "MerchantReturnPolicy",
+  applicableCountry: "US",
+  returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+  merchantReturnDays: 30,
+  returnMethod: "https://schema.org/ReturnByMail",
+};
+const productLd = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  name: PRODUCT_NAME,
+  description: DESC,
+  brand: { "@type": "Brand", name: "KAYANU" },
+  image: [imageAt(heroImg, 1200), imageAt(flatlayImg, 1200), imageAt(compressImg, 1200)],
+  color: COLORS.map((c) => c.label).join(", "),
+  offers: VARIANTS.map((v) => ({
+    "@type": "Offer",
+    name: v.label,
+    price: v.price.toFixed(2),
+    priceCurrency: "USD",
+    availability: "https://schema.org/InStock",
+    itemCondition: "https://schema.org/NewCondition",
+    url: `${SITE_URL}/#buy`,
+    shippingDetails: shippingDetails(v.price),
+    hasMerchantReturnPolicy: returnPolicy,
+  })),
+};
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ.map(([q, a]) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -43,8 +121,16 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: DESC },
       { property: "og:type", content: "product" },
       { property: "og:url", content: SITE_URL },
-      { property: "og:image", content: heroImg },
+      { property: "og:image", content: imageAt(heroImg, 1200) },
+      { property: "og:image:alt", content: "KAYANU compression packing cubes in an open suitcase" },
+      { property: "product:price:amount", content: getVariant("1-set").price.toFixed(2) },
+      { property: "product:price:currency", content: "USD" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: TITLE },
+      { name: "twitter:description", content: DESC },
+      { name: "twitter:image", content: imageAt(heroImg, 1200) },
+      { "script:ld+json": productLd },
+      { "script:ld+json": faqLd },
     ],
     links: [canonicalLink("/")],
   }),
@@ -81,6 +167,7 @@ function Home() {
       <Guarantee />
       <Faq />
       {WELCOME_CODE && <WelcomeOffer code={WELCOME_CODE} />}
+      <MobileBuyBar />
     </SiteShell>
   );
 }
@@ -89,10 +176,11 @@ function Hero() {
   const price = getVariant("1-set").price;
   return (
     <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-12 md:grid-cols-2 md:py-20">
-      <div className="reveal">
-        <span className="inline-block rounded-full bg-accent/15 px-3 py-1 text-xs font-bold tracking-wider text-accent">
-          8-PIECE COMPRESSION SET
-        </span>
+      {/* No .reveal here: the first screen must paint immediately (LCP, first impression). */}
+      <div>
+        <p className="inline-block rounded-full bg-accent/15 px-3 py-1 text-xs font-bold tracking-wider text-accent">
+          8-PIECE COMPRESSION PACKING CUBES
+        </p>
         <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] sm:text-5xl lg:text-6xl">
           Pack twice as much. Stress half as much.
         </h1>
@@ -101,10 +189,13 @@ function Hero() {
           everything fits — and stays organized — in any suitcase.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-5">
-          <a href="#buy" className="btn-primary">
+          <a id="hero-cta" href="#buy" className="btn-primary w-full sm:w-auto">
             Get the 8-Piece Set — {formatPrice(price)}
           </a>
-          <a href="#how-it-works" className="font-semibold underline underline-offset-4">
+          <a
+            href="#how-it-works"
+            className="inline-block py-3 font-semibold underline underline-offset-4"
+          >
             See how it works
           </a>
         </div>
@@ -126,12 +217,14 @@ function Hero() {
           ))}
         </ul>
       </div>
-      <div className="reveal">
+      <div>
         <img
-          src={heroImg}
-          width={1536}
-          height={1152}
-          alt="Open suitcase packed with KAYANU compression cubes"
+          {...responsiveImage(heroImg, "(min-width: 1152px) 556px, (min-width: 768px) 50vw, 100vw")}
+          width={1200}
+          height={900}
+          fetchPriority="high"
+          decoding="async"
+          alt="Open suitcase packed with KAYANU compression packing cubes"
           className="aspect-[4/3] w-full rounded-3xl object-cover shadow-[var(--shadow-lift)]"
         />
       </div>
@@ -195,10 +288,14 @@ function HowItWorks() {
       className="mx-auto grid max-w-6xl scroll-mt-28 items-center gap-12 px-5 py-20 md:grid-cols-2"
     >
       <img
-        src={compressImg}
-        width={1280}
-        height={1024}
+        {...responsiveImage(
+          compressImg,
+          "(min-width: 1152px) 540px, (min-width: 768px) 50vw, 100vw",
+        )}
+        width={1200}
+        height={960}
         loading="lazy"
+        decoding="async"
         alt="Zipping the compression zipper on a packing cube"
         className="reveal rounded-3xl object-cover shadow-[var(--shadow-soft)]"
       />
@@ -245,11 +342,15 @@ function Inside() {
         </div>
         <div className="mt-12 grid items-center gap-10 md:grid-cols-2">
           <img
-            src={flatlayImg}
-            width={1280}
-            height={1280}
+            {...responsiveImage(
+              flatlayImg,
+              "(min-width: 1152px) 540px, (min-width: 768px) 50vw, 100vw",
+            )}
+            width={1200}
+            height={1200}
             loading="lazy"
-            alt="Flat lay of all pieces in the KAYANU set"
+            decoding="async"
+            alt="Flat lay of all pieces in the KAYANU compression packing cube set"
             className="reveal rounded-3xl shadow-[var(--shadow-soft)]"
           />
           <div className="grid gap-4 sm:grid-cols-2">
@@ -279,10 +380,14 @@ function Buy() {
     >
       <div className="reveal">
         <img
-          src={flatlayImg}
-          width={1280}
-          height={1280}
+          {...responsiveImage(
+            flatlayImg,
+            "(min-width: 1152px) 540px, (min-width: 768px) 50vw, 100vw",
+          )}
+          width={1200}
+          height={1200}
           loading="lazy"
+          decoding="async"
           alt="KAYANU 8-piece compression packing cube set"
           className="sticky top-28 rounded-3xl shadow-[var(--shadow-lift)]"
         />
@@ -409,9 +514,15 @@ function CompleteKit() {
               className="reveal flex flex-col overflow-hidden rounded-3xl bg-secondary shadow-[var(--shadow-soft)]"
             >
               <img
-                src={a.image}
+                {...responsiveImage(
+                  a.image,
+                  "(min-width: 1152px) 352px, (min-width: 768px) 33vw, 100vw",
+                )}
+                width={1200}
+                height={900}
                 alt={a.name}
                 loading="lazy"
+                decoding="async"
                 className="aspect-[4/3] w-full object-cover"
               />
               <div className="flex flex-1 flex-col p-6">
@@ -509,31 +620,47 @@ function Faq() {
         Frequently asked questions
       </h2>
       <div className="reveal mt-8">
-        <Accordion q="How long is shipping?">
-          Orders are processed in 1–2 business days, then delivered in 3–8 business days anywhere in
-          the U.S. You'll receive tracking by email as soon as your order ships.
-        </Accordion>
-        <Accordion q="What's included?">
-          Each set includes 8 compression cubes (2 XL, 2 Large, 2 Medium, 2 Small), plus a shoe
-          pouch and a laundry bag.
-        </Accordion>
-        <Accordion q="Will the set fit a carry-on?">
-          Yes. The graduated sizes fit carry-on and checked luggage — use the smaller cubes for a
-          carry-on and the full set for checked bags.
-        </Accordion>
-        <Accordion q="How does compression work?">
-          Pack the cube and close the main zipper. Then close the second compression zipper around
-          the edge — it pulls the cube flatter and pushes out the air.
-        </Accordion>
-        <Accordion q="What if a zipper breaks?">
-          Every zipper is quality-checked before shipping. If one fails, contact us and we'll
-          replace it or refund you.
-        </Accordion>
-        <Accordion q="What is your return policy?">
-          You have 30 days from delivery to return your order for a full refund.
-        </Accordion>
+        {FAQ.map(([q, a]) => (
+          <Accordion key={q} q={q}>
+            {a}
+          </Accordion>
+        ))}
       </div>
     </section>
+  );
+}
+
+// Mobile-only bar that keeps "buy" one tap away once the hero button has scrolled off;
+// hidden over the buy section and the footer so it never covers them.
+function MobileBuyBar() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const targets = [
+      document.getElementById("hero-cta"),
+      document.getElementById("buy"),
+      document.querySelector("footer"),
+    ].filter((el): el is HTMLElement => el !== null);
+    const visible = new Map<Element, boolean>();
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) visible.set(e.target, e.isIntersecting);
+      setShow(targets.every((t) => !visible.get(t)));
+    });
+    targets.forEach((t) => io.observe(t));
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div
+      inert={!show}
+      className={`fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 px-4 pt-3 backdrop-blur transition-transform duration-300 md:hidden ${show ? "translate-y-0" : "translate-y-full"}`}
+      style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+    >
+      <a href="#buy" className="btn-primary w-full">
+        Shop the set — from {formatPrice(getVariant("1-set").price)}
+      </a>
+      <p className="mt-1.5 text-center text-xs text-muted-foreground">
+        Free U.S. shipping over $49 · 30-day returns
+      </p>
+    </div>
   );
 }
 
