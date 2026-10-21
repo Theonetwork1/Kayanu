@@ -28,8 +28,8 @@ function Header() {
         FAST U.S. SHIPPING — DELIVERED IN 3–8 DAYS • 30-DAY HAPPINESS GUARANTEE
       </div>
       <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <Link to="/" className="font-display text-xl font-extrabold tracking-[0.2em]">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-2">
+          <Link to="/" className="py-3 font-display text-xl font-extrabold tracking-[0.2em]">
             {STORE_NAME}
           </Link>
           <nav className="hidden gap-8 text-sm font-medium md:flex">
@@ -46,15 +46,15 @@ function Header() {
           {/* No cart: every product checks out through its own Stripe payment link. */}
           <a
             href="/#buy"
-            className="flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+            className="flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
           >
             <ShoppingBag className="h-4 w-4" aria-hidden="true" />
             Shop now
           </a>
         </div>
-        <nav className="flex justify-center gap-5 overflow-x-auto pb-3 text-xs font-medium text-muted-foreground md:hidden">
+        <nav className="flex justify-center gap-1 overflow-x-auto pb-1 text-xs font-medium text-muted-foreground md:hidden">
           {links.map(([l, id]) => (
-            <a key={id} href={`/#${id}`}>
+            <a key={id} href={`/#${id}`} className="whitespace-nowrap px-2.5 py-3">
               {l}
             </a>
           ))}
@@ -79,9 +79,9 @@ function Footer() {
           <p className="font-display text-2xl font-extrabold tracking-[0.2em]">{STORE_NAME}</p>
           <p className="mt-2 opacity-80">Premium travel essentials. Pack more, stress less.</p>
         </div>
-        <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm md:justify-end">
+        <nav className="-mx-2 flex flex-wrap gap-x-2 text-sm md:justify-end">
           {links.map(([to, l]) => (
-            <Link key={to} to={to} className="opacity-80 hover:opacity-100">
+            <Link key={to} to={to} className="px-2 py-3 opacity-80 hover:opacity-100">
               {l}
             </Link>
           ))}
