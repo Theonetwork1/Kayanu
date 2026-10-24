@@ -13,6 +13,8 @@ import { Analytics } from "@vercel/analytics/react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { CartProvider } from "../context/CartContext";
+import { CartDrawer } from "../components/CartDrawer";
 
 function NotFoundComponent() {
   return (
@@ -156,8 +158,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
-      <Analytics />
+      <CartProvider>
+        <Outlet />
+        <CartDrawer />
+        <Analytics />
+      </CartProvider>
     </QueryClientProvider>
   );
 }

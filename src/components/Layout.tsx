@@ -3,6 +3,8 @@ import { useEffect, type ReactNode } from "react";
 import { ShoppingBag } from "lucide-react";
 import { STORE_NAME } from "@/config";
 
+import { useCart } from "@/context/CartContext";
+
 export function useReveal() {
   useEffect(() => {
     const els = document.querySelectorAll(".reveal");
@@ -16,9 +18,10 @@ export function useReveal() {
 }
 
 function Header() {
+  const { openCart, totalItems } = useCart();
   const links = [
-    ["Shop", "buy"],
-    ["How It Works", "how-it-works"],
+    ["Shop Sets", "buy"],
+    ["Toiletry Bag", "toiletry"],
     ["What's Inside", "inside"],
     ["FAQ", "faq"],
   ];
@@ -43,14 +46,29 @@ function Header() {
               </a>
             ))}
           </nav>
-          {/* No cart: every product checks out through its own Stripe payment link. */}
-          <a
-            href="/#buy"
-            className="flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
-          >
-            <ShoppingBag className="h-4 w-4" aria-hidden="true" />
-            Shop now
-          </a>
+          
+          <div className="flex items-center gap-3">
+            <button
+              onClick={openCart}
+              className="relative flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground hover:border-primary/40 transition shadow-xs"
+              aria-label={`View cart with ${totalItems} items`}
+            >
+              <ShoppingBag className="h-4 w-4 text-primary" />
+              <span className="hidden sm:inline">Cart</span>
+              {totalItems > 0 && (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-accent-foreground shadow-xs animate-in zoom-in-75 duration-200">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+
+            <a
+              href="/#buy"
+              className="flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+            >
+              Shop now
+            </a>
+          </div>
         </div>
         <nav className="flex justify-center gap-1 overflow-x-auto pb-1 text-xs font-medium text-muted-foreground md:hidden">
           {links.map(([l, id]) => (

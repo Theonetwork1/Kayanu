@@ -69,7 +69,10 @@ export const Route = createFileRoute("/api/cj-webhook")({
 
           // Sandbox orders are fake: send the customer email to the owner instead.
           const sandbox = cjSandbox();
-          const owner = process.env["ORDER_NOTIFY_EMAIL"];
+          const owner =
+            process.env["ORDER_NOTIFY_EMAIL"] ||
+            process.env["ADMIN_EMAIL"] ||
+            process.env["OWNER_EMAIL"];
           if (sandbox && !owner) return ok();
           const mail = orderStatus(sandbox ? { ...order, email: owner } : order, shipment.kind, {
             trackingNumber: shipment.trackingNumber,

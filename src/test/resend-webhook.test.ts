@@ -5,6 +5,7 @@ import {
   signSvix,
   verifySvixSignature,
 } from "@/lib/resend-webhook.server";
+import { orderConfirmation, ownerNewOrder } from "@/lib/emails.server";
 
 const SECRET = "whsec_MfKQ9r8GKYqrTwjUPD8ILPZIo2LaLaSw";
 const ID = "msg_p5jXN8AQM9LWM0D4loKWxJek";
@@ -72,5 +73,41 @@ describe("Resend delivery problems", () => {
       emailId: "em_1",
       reason: "Permanent — General — Mailbox does not exist",
     });
+  });
+});
+
+describe("Transactional emails generation", () => {
+  const dummyOrder = {
+    sessionId: "cs_test_12345678",
+    number: "KAY-12345678",
+    email: "customer@example.com",
+    name: "John Doe",
+    currency: "usd",
+    items: [{ name: "KAYANU 6-Piece Compression Set", qty: 1, amount: 4999 }],
+    subtotal: 4999,
+    shipping: 0,
+    tax: 0,
+    total: 4999,
+    address: ["John Doe", "123 Main St", "New York, NY, 10001", "United States"],
+    promoConsent: false,
+  };
+
+  it("builds customer orderConfirmation mail correctly", () => {
+    const mail = orderConfirmation(dummyOrder);
+    expect(mail).not.toBeNull();
+    expect(mail?.to).toBe("customer@example.com");
+    expect(mail?.subject).toContain("KAY-12345678");
+    expect(mail?.html).toContain("Thank you, John");
+    expect(mail?.html).toContain("$49.99");
+    expect(mail?.idempotencyKey).toBe("order-confirmation/cs_test_12345678");
+  });
+
+  it("builds owner notification email in English", () => {
+    const mail = ownerNewOrder(dummyOrder, "admin@kayanu.com");
+    expect(mail.to).toBe("admin@kayanu.com");
+    expect(mail.subject).toContain("New Order KAY-12345678");
+    expect(mail.html).toContain("New Order");
+    expect(mail.html).toContain("customer@example.com");
+    expect(mail.idempotencyKey).toBe("owner-new-order/cs_test_12345678");
   });
 });

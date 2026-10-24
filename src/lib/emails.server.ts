@@ -4,10 +4,16 @@
 import Stripe from "stripe";
 
 const SITE = "https://www.kayanu.com";
-const SUPPORT_EMAIL = "support@kayanu.com";
-const FROM_ORDERS = "KAYANU <orders@kayanu.com>";
+const SUPPORT_EMAIL = process.env["SUPPORT_EMAIL"] || "support@kayanu.com";
+const FROM_ORDERS = process.env["RESEND_FROM_EMAIL"] || "KAYANU <orders@kayanu.com>";
 
-const C = { teal: "#0C3B3C", cream: "#FAF7F2", accent: "#E07856", muted: "#6B7F80", text: "#3D5A5B" };
+const C = {
+  teal: "#0C3B3C",
+  cream: "#FAF7F2",
+  accent: "#E07856",
+  muted: "#6B7F80",
+  text: "#3D5A5B",
+};
 // Same typefaces as the site (Sora headings, Inter body), loaded from Google Fonts where the
 // mail client allows it (Apple Mail, iOS, many webmails); others fall back to Arial.
 const FONT_DISPLAY = "'Sora','Inter',Arial,Helvetica,sans-serif";
@@ -23,7 +29,9 @@ const esc = (v: unknown) =>
     .replace(/"/g, "&quot;");
 
 const money = (cents: number, currency = "usd") =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
+  new Intl.NumberFormat("en-US", { style: "currency", currency: currency.toUpperCase() }).format(
+    cents / 100,
+  );
 
 /** Picks the Stripe secret key: STRIPE_SECRET_KEY, or KAYANU if it holds a secret/restricted key. */
 export function getStripeKey(): string | undefined {
@@ -118,7 +126,13 @@ export async function loadOrder(sessionId: string): Promise<Order> {
 
 // ---------- layout ----------
 
-function layout(opts: { preheader: string; title: string; body: string; lang?: string; footer?: string }) {
+function layout(opts: {
+  preheader: string;
+  title: string;
+  body: string;
+  lang?: string;
+  footer?: string;
+}) {
   const link = (label: string, href: string) =>
     `<a href="${href}" style="color:${C.muted};text-decoration:underline;">${label}</a>`;
   const footer =
@@ -193,14 +207,22 @@ const addressBlock = (o: Order, label = "Shipping to") =>
 
 // ---------- email builders ----------
 
-export type Mail = { to: string; subject: string; html: string; idempotencyKey: string; replyTo?: string | undefined };
+export type Mail = {
+  to: string;
+  subject: string;
+  html: string;
+  idempotencyKey: string;
+  replyTo?: string | undefined;
+};
 
 export function orderConfirmation(o: Order): Mail | null {
   if (!o.email) return null;
   const first = o.name?.split(" ")[0];
   const body = [
     h1(`Thank you${first ? `, ${esc(first)}` : ""}!`),
-    p(`We've received your order <strong>${esc(o.number)}</strong> and it's being prepared for shipping.`),
+    p(
+      `We've received your order <strong>${esc(o.number)}</strong> and it's being prepared for shipping.`,
+    ),
     itemsTable(o, true),
     addressBlock(o),
     p(
@@ -212,32 +234,42 @@ export function orderConfirmation(o: Order): Mail | null {
   return {
     to: o.email,
     subject: `Your KAYANU order ${o.number} is confirmed`,
-    html: layout({ preheader: `Order ${o.number} — ${money(o.total, o.currency)}`, title: "Order confirmed", body }),
+    html: layout({
+      preheader: `Order ${o.number} — ${money(o.total, o.currency)}`,
+      title: "Order confirmed",
+      body,
+    }),
     idempotencyKey: `order-confirmation/${o.sessionId}`,
     replyTo: SUPPORT_EMAIL,
   };
 }
 
 export function ownerNewOrder(o: Order, to: string): Mail {
-  const stripeLink = o.paymentIntent ? `https://dashboard.stripe.com/payments/${o.paymentIntent}` : "https://dashboard.stripe.com/payments";
+  const stripeLink = o.paymentIntent
+    ? `https://dashboard.stripe.com/payments/${o.paymentIntent}`
+    : "https://dashboard.stripe.com/payments";
   const body = [
-    h1(`Nouvelle commande ${esc(o.number)}`),
-    p(`<strong>${money(o.total, o.currency)}</strong> encaissés.<br>Client : ${esc(o.name ?? "—")} &lt;${esc(o.email ?? "email inconnu")}&gt;`),
+    h1(`New Order ${esc(o.number)}`),
+    p(
+      `<strong>${money(o.total, o.currency)}</strong> received.<br>Customer: ${esc(o.name ?? "—")} &lt;${esc(o.email ?? "unknown email")}&gt;`,
+    ),
     itemsTable(o, true),
-    addressBlock(o, "Adresse de livraison"),
-    p("Prochaine étape : passer la commande chez le fournisseur, puis envoyer le suivi au client (endpoint <code>/api/order-status</code>)."),
-    button("Voir le paiement dans Stripe", stripeLink),
-    small(`ID de session Stripe : ${esc(o.sessionId)}`),
+    addressBlock(o, "Shipping Address"),
+    p(
+      "Next step: Fulfill order via supplier, then send tracking updates to customer (/api/order-status).",
+    ),
+    button("View Payment in Stripe", stripeLink),
+    small(`Stripe Session ID: ${esc(o.sessionId)}`),
   ].join("");
   return {
     to,
-    subject: `Nouvelle commande ${o.number} — ${money(o.total, o.currency)}`,
+    subject: `New Order ${o.number} — ${money(o.total, o.currency)}`,
     html: layout({
-      preheader: `${o.name ?? "Client"} — ${money(o.total, o.currency)}`,
-      title: "Nouvelle commande",
+      preheader: `${o.name ?? "Customer"} — ${money(o.total, o.currency)}`,
+      title: "New Order",
       body,
-      lang: "fr",
-      footer: "Notification interne KAYANU",
+      lang: "en",
+      footer: "KAYANU Internal Notification",
     }),
     idempotencyKey: `owner-new-order/${o.sessionId}`,
   };
@@ -254,12 +286,16 @@ export function orderStatus(o: Order, status: ShipmentStatus, t: Tracking): Mail
   if (!o.email) return null;
   const first = o.name?.split(" ")[0];
   const safeUrl = t.trackingUrl && /^https:\/\//i.test(t.trackingUrl) ? t.trackingUrl : undefined;
-  const trackingLines = t.trackingNumber ? `Tracking number: <strong>${esc(t.trackingNumber)}</strong>` : "";
+  const trackingLines = t.trackingNumber
+    ? `Tracking number: <strong>${esc(t.trackingNumber)}</strong>`
+    : "";
   const body =
     status === "shipped"
       ? [
           h1("Your order is on its way"),
-          p(`Good news${first ? `, ${esc(first)}` : ""} &mdash; order <strong>${esc(o.number)}</strong> has shipped. Delivery usually takes 3&ndash;8 business days.`),
+          p(
+            `Good news${first ? `, ${esc(first)}` : ""} &mdash; order <strong>${esc(o.number)}</strong> has shipped. Delivery usually takes 3&ndash;8 business days.`,
+          ),
           trackingLines ? p(trackingLines) : "",
           safeUrl ? button("Track my package", safeUrl) : "",
           itemsTable(o, false),
@@ -267,14 +303,21 @@ export function orderStatus(o: Order, status: ShipmentStatus, t: Tracking): Mail
         ].join("")
       : [
           h1("Your order was delivered"),
-          p(`Order <strong>${esc(o.number)}</strong> has been delivered${first ? `, ${esc(first)}` : ""}. We hope you love your KAYANU cubes!`),
-          p(`If anything isn't right, email <a href="mailto:${SUPPORT_EMAIL}" style="color:${C.teal};font-weight:bold;">${SUPPORT_EMAIL}</a> within 30 days of delivery to start a return &mdash; our happiness guarantee has you covered.`),
+          p(
+            `Order <strong>${esc(o.number)}</strong> has been delivered${first ? `, ${esc(first)}` : ""}. We hope you love your KAYANU cubes!`,
+          ),
+          p(
+            `If anything isn't right, email <a href="mailto:${SUPPORT_EMAIL}" style="color:${C.teal};font-weight:bold;">${SUPPORT_EMAIL}</a> within 30 days of delivery to start a return &mdash; our happiness guarantee has you covered.`,
+          ),
           button("Shop KAYANU", SITE),
           itemsTable(o, false),
         ].join("");
   return {
     to: o.email,
-    subject: status === "shipped" ? `Your KAYANU order ${o.number} has shipped` : `Your KAYANU order ${o.number} was delivered`,
+    subject:
+      status === "shipped"
+        ? `Your KAYANU order ${o.number} has shipped`
+        : `Your KAYANU order ${o.number} was delivered`,
     html: layout({
       preheader: status === "shipped" ? "Your package is on its way." : "Your package has arrived.",
       title: status === "shipped" ? "Order shipped" : "Order delivered",
@@ -309,45 +352,75 @@ export function abandonedCart(o: Order): Mail | null {
   };
 }
 
-/** Owner alert (French) when a paid order could not be sent to CJdropshipping automatically. */
+/** Owner alert when a paid order could not be sent to CJdropshipping automatically. */
 export function ownerCjManual(o: Order, reason: string, to: string, retrying = false): Mail {
   const body = [
-    h1(retrying ? `Envoi à CJ en échec : ${esc(o.number)}` : `Commande ${esc(o.number)} à passer chez CJ`),
-    p(`La commande payée n'a pas pu être envoyée automatiquement à CJdropshipping.<br>Raison : <strong>${esc(reason)}</strong>`),
+    h1(
+      retrying
+        ? `CJ Order Placement Failed: ${esc(o.number)}`
+        : `Action Required: Order ${esc(o.number)} for CJ`,
+    ),
+    p(
+      `The paid order could not be placed automatically with CJdropshipping.<br>Reason: <strong>${esc(reason)}</strong>`,
+    ),
     itemsTable(o, false),
-    addressBlock(o, "Adresse de livraison"),
+    addressBlock(o, "Shipping Address"),
     retrying
-      ? p("Erreur temporaire : Stripe va renvoyer la commande automatiquement. Ne la passez pas à la main tout de suite ; si elle n'apparaît pas dans My CJ d'ici 24 h, passez-la manuellement.")
-      : p("Passez-la manuellement dans My CJ, puis corrigez la cause (voir <code>src/lib/cj-catalog.ts</code> et les variables CJ_* sur Vercel)."),
-    small(`ID de session Stripe : ${esc(o.sessionId)}`),
+      ? p(
+          "Temporary error: Stripe will retry automatically. If it does not appear in My CJ within 24 hours, place it manually.",
+        )
+      : p(
+          "Place the order manually in My CJ, then verify catalog setup and CJ_* environment variables.",
+        ),
+    small(`Stripe Session ID: ${esc(o.sessionId)}`),
   ].join("");
   return {
     to,
-    subject: `Action requise : commande ${o.number} non envoyée à CJ`,
-    html: layout({ preheader: reason, title: "Commande CJ", body, lang: "fr", footer: "Notification interne KAYANU" }),
+    subject: `Action Required: Order ${o.number} not sent to CJ`,
+    html: layout({
+      preheader: reason,
+      title: "CJ Order",
+      body,
+      lang: "en",
+      footer: "KAYANU Internal Notification",
+    }),
     idempotencyKey: `cj-manual/${o.sessionId}`,
   };
 }
 
-/** Owner alert (French) when Resend reports that a customer email was not delivered. */
+/** Owner alert when Resend reports that a customer email was not delivered. */
 export function ownerDeliveryProblem(
   p0: { event: string; to: string; subject: string; reason: string; emailId: string },
   ownerTo: string,
   eventId: string,
 ): Mail {
   const label =
-    p0.event === "email.bounced" ? "rejeté (bounce)" : p0.event === "email.complained" ? "signalé comme spam" : "non envoyé";
+    p0.event === "email.bounced"
+      ? "Bounced"
+      : p0.event === "email.complained"
+        ? "Marked as Spam"
+        : "Delivery Failed";
   const body = [
-    h1(`E-mail client ${label}`),
-    p(`Destinataire : <strong>${esc(p0.to || "inconnu")}</strong><br>Objet : ${esc(p0.subject || "—")}`),
-    p(`Raison : ${esc(p0.reason)}`),
-    p("Le client n'a pas reçu cet e-mail. Vérifiez l'adresse dans Stripe et contactez-le par un autre moyen si besoin."),
-    button("Voir l'e-mail dans Resend", `https://resend.com/emails/${encodeURIComponent(p0.emailId)}`),
+    h1(`Customer Email ${label}`),
+    p(
+      `Recipient: <strong>${esc(p0.to || "unknown")}</strong><br>Subject: ${esc(p0.subject || "—")}`,
+    ),
+    p(`Reason: ${esc(p0.reason)}`),
+    p(
+      "The customer did not receive this email. Please verify their address in Stripe and reach out if necessary.",
+    ),
+    button("View Email in Resend", `https://resend.com/emails/${encodeURIComponent(p0.emailId)}`),
   ].join("");
   return {
     to: ownerTo,
-    subject: `E-mail client ${label} — ${p0.to || "destinataire inconnu"}`,
-    html: layout({ preheader: p0.reason, title: "Problème de livraison", body, lang: "fr", footer: "Notification interne KAYANU" }),
+    subject: `Customer Email ${label} — ${p0.to || "unknown recipient"}`,
+    html: layout({
+      preheader: p0.reason,
+      title: "Delivery Problem",
+      body,
+      lang: "en",
+      footer: "KAYANU Internal Notification",
+    }),
     idempotencyKey: `resend-alert/${eventId}`,
   };
 }

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   Check,
@@ -10,7 +10,9 @@ import {
   Wind,
   Shirt,
   ChevronDown,
+  ShoppingBag,
 } from "lucide-react";
+import { useCart } from "@/context/CartContext";
 import { SiteShell, useReveal } from "@/components/Layout";
 import {
   ADDONS,
@@ -26,15 +28,26 @@ import {
 } from "@/config";
 import type { LucideIcon } from "lucide-react";
 import { imageAt, responsiveImage } from "@/lib/images";
-// Supplier photos: replace with your own hosted images when available.
-const heroImg = "https://s.alicdn.com/@sc04/kf/H98ada98627f3418784ac2191c9f120b0R.jpg"; // 8-piece compression set
-const flatlayImg = "https://s.alicdn.com/@sc04/kf/H88755db5b1d64dfd8cda54d16e9559c88.jpg"; // charcoal cubes lineup
-const compressImg = "https://s.alicdn.com/@sc04/kf/He37eee519eb344c2a9c3a13c32dbeff9I.jpg"; // beige cubes, lifestyle
+export const COLOR_IMAGES: Record<ColorId, string> = {
+  sand: "https://cf.cjdropshipping.com/quick/product/950a6309-811c-4153-9968-c00074f91019.jpg", // Beige / Sand (CJYD196103714NM)
+  charcoal: "https://cf.cjdropshipping.com/quick/product/9118dbac-738e-4f46-a0b7-48020296dbd8.jpg", // Black / Charcoal (CJYD196103707GT)
+  "ocean-teal": "https://cf.cjdropshipping.com/quick/product/7bdc3f77-c082-4293-847c-ebb2fab5cb1f.jpg", // Navy / Ocean Teal (CJYD196103712LO)
+  "cloud-gray": "https://cf.cjdropshipping.com/quick/product/2a3984ad-5b1b-4db3-989b-5f03dfaf42cd.jpg", // Gray (CJYD196103709IR)
+  "crimson-red": "https://cf.cjdropshipping.com/quick/product/fab60df4-850e-440c-a734-1e8439211055.jpg", // Red (CJYD196103708HS)
+  "sage-green": "https://cf.cjdropshipping.com/quick/product/34348907-750a-41e6-bdec-9444e2e93445.jpg", // Green (CJYD196103710JQ)
+  "sky-blue": "https://cf.cjdropshipping.com/quick/product/f187d3df-9b61-4730-8d4b-d41734e961ac.jpg", // Sky Blue (CJYD196103711KP)
+  "blossom-pink": "https://cf.cjdropshipping.com/quick/product/0fdadc7d-1508-4b9c-bae0-3b9f45d26454.jpg", // Pink (CJYD196103713MN)
+};
 
-const TITLE = "Compression Packing Cubes — 8-Piece Travel Set | KAYANU";
+// High-definition product visuals
+const heroImg = "/images/products/kayanu-6pc-suitcase-packed.jpg"; // Real packed suitcase lifestyle
+const compressImg = "https://cf.cjdropshipping.com/17159040/2405170951120324600.jpg"; // Step 1 -> Step 2 -> Step 3 60% compression demo
+const insideImg = "/images/products/kayanu-6pc-lineup.png"; // All 6 pieces standing together with garment classification icons
+
+const TITLE = "Compression Packing Cubes — 6-Piece Travel Set | KAYANU";
 const DESC =
-  "Pack twice as much: 8 compression packing cubes plus a shoe pouch and laundry bag. Fits carry-on and checked luggage. Free U.S. shipping over $49, 30-day returns.";
-const PRODUCT_NAME = "KAYANU 8-Piece Compression Packing Cube Set";
+  "Pack twice as much: 5 graduated compression cubes plus a dedicated drawstring shoe/laundry bag (6 pieces total). Fits carry-on and checked luggage. Free U.S. shipping over $49, 30-day returns.";
+const PRODUCT_NAME = "KAYANU 6-Piece Compression Packing Cube Set";
 
 const FAQ: [string, string][] = [
   [
@@ -42,8 +55,8 @@ const FAQ: [string, string][] = [
     "Orders are processed in 1–2 business days, then delivered in 3–8 business days anywhere in the U.S. You'll receive tracking by email as soon as your order ships.",
   ],
   [
-    "What's included?",
-    "Each set includes 8 compression cubes (2 XL, 2 Large, 2 Medium, 2 Small), plus a shoe pouch and a laundry bag.",
+    "What's included in the set?",
+    "Each set includes 6 pieces: 1 Extra Large cube (for jackets and sweaters), 1 Large cube (for pants and dresses), 1 Medium cube (for shirts), 1 Small cube (for underwear), 1 Slim accessories pouch (for socks and cords), and 1 versatile drawstring shoe/laundry bag.",
   ],
   [
     "Will the set fit a carry-on?",
@@ -88,7 +101,11 @@ const productLd = {
   name: PRODUCT_NAME,
   description: DESC,
   brand: { "@type": "Brand", name: "KAYANU" },
-  image: [imageAt(heroImg, 1200), imageAt(flatlayImg, 1200), imageAt(compressImg, 1200)],
+  image: [
+    heroImg.startsWith("http") ? heroImg : `${SITE_URL}${heroImg}`,
+    insideImg.startsWith("http") ? insideImg : `${SITE_URL}${insideImg}`,
+    compressImg.startsWith("http") ? compressImg : `${SITE_URL}${compressImg}`,
+  ],
   color: COLORS.map((c) => c.label).join(", "),
   offers: VARIANTS.map((v) => ({
     "@type": "Offer",
@@ -179,7 +196,7 @@ function Hero() {
       {/* No .reveal here: the first screen must paint immediately (LCP, first impression). */}
       <div>
         <p className="inline-block rounded-full bg-accent/15 px-3 py-1 text-xs font-bold tracking-wider text-accent">
-          8-PIECE COMPRESSION PACKING CUBES
+          6-PIECE COMPRESSION PACKING CUBES
         </p>
         <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] sm:text-5xl lg:text-6xl">
           Pack twice as much. Stress half as much.
@@ -190,7 +207,7 @@ function Hero() {
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-5">
           <a id="hero-cta" href="#buy" className="btn-primary w-full sm:w-auto">
-            Get the 8-Piece Set — {formatPrice(price)}
+            Get the 6-Piece Set — {formatPrice(price)}
           </a>
           <a
             href="#how-it-works"
@@ -324,12 +341,12 @@ function HowItWorks() {
 
 function Inside() {
   const pieces = [
-    ["2 × XL compression cubes", "Jackets, sweaters, jeans"],
-    ["2 × Large compression cubes", "Shirts, dresses, pants"],
-    ["2 × Medium compression cubes", "T-shirts, shorts, sleepwear"],
-    ["2 × Small compression cubes", "Underwear, socks, swimwear"],
-    ["1 × Shoe pouch", "Keeps soles away from clothes"],
-    ["1 × Laundry bag", "Separates dirty from clean"],
+    ["1 × Extra Large cube", "Coats, jackets, heavy sweaters (15.7″ × 15.7″ × 3.5″)"],
+    ["1 × Large cube", "Jeans, trousers, dresses (11.8″ × 15.7″ × 3.5″)"],
+    ["1 × Medium cube", "Shirts, tops, activewear (9.8″ × 13.7″ × 3.5″)"],
+    ["1 × Small cube", "Underwear, bras, swimwear (7.8″ × 11.8″ × 3.5″)"],
+    ["1 × Slim accessories pouch", "Socks, charging cables, adapters (13.7″ × 3.9″ × 3.5″)"],
+    ["1 × Drawstring bag", "Keeps dirty laundry or shoes separated (18.5″ × 13.7″)"],
   ];
   return (
     <section id="inside" className="scroll-mt-28 bg-secondary py-20">
@@ -337,21 +354,21 @@ function Inside() {
         <div className="reveal text-center">
           <Eyebrow>What's inside the set</Eyebrow>
           <h2 className="text-3xl font-extrabold sm:text-4xl">
-            8 compression cubes + shoe pouch + laundry bag
+            6 pieces: 5 compression cubes + 1 drawstring shoe/laundry bag
           </h2>
         </div>
         <div className="mt-12 grid items-center gap-10 md:grid-cols-2">
           <img
             {...responsiveImage(
-              flatlayImg,
+              insideImg,
               "(min-width: 1152px) 540px, (min-width: 768px) 50vw, 100vw",
             )}
             width={1200}
             height={1200}
             loading="lazy"
             decoding="async"
-            alt="Flat lay of all pieces in the KAYANU compression packing cube set"
-            className="reveal rounded-3xl shadow-[var(--shadow-soft)]"
+            alt="All 6 pieces in the KAYANU compression packing cube set with garment icons"
+            className="reveal rounded-3xl shadow-[var(--shadow-soft)] bg-card"
           />
           <div className="grid gap-4 sm:grid-cols-2">
             {pieces.map(([t, d]) => (
@@ -369,10 +386,25 @@ function Inside() {
 }
 
 function Buy() {
+  const { addItem } = useCart();
   const [color, setColor] = useState<ColorId>("charcoal");
   const [variant, setVariant] = useState<VariantId>("2-sets");
   const v = getVariant(variant);
   const colorLabel = COLORS.find((c) => c.id === color)!.label;
+  const activeImg = COLOR_IMAGES[color] || flatlayImg;
+
+  const handleAddToCart = () => {
+    addItem({
+      id: `set-${variant}-${color}`,
+      productId: "kayanu-6-piece-compression-set",
+      name: `KAYANU 6-Piece Set (${v.label})`,
+      variantName: colorLabel,
+      price: v.price,
+      image: activeImg,
+      checkoutUrl: v.checkoutUrl,
+    });
+  };
+
   return (
     <section
       id="buy"
@@ -380,22 +412,23 @@ function Buy() {
     >
       <div className="reveal">
         <img
+          key={color}
           {...responsiveImage(
-            flatlayImg,
+            activeImg,
             "(min-width: 1152px) 540px, (min-width: 768px) 50vw, 100vw",
           )}
           width={1200}
           height={1200}
           loading="lazy"
           decoding="async"
-          alt="KAYANU 8-piece compression packing cube set"
-          className="sticky top-28 rounded-3xl shadow-[var(--shadow-lift)]"
+          alt={`KAYANU 6-piece compression packing cube set in ${colorLabel}`}
+          className="sticky top-28 rounded-3xl shadow-[var(--shadow-lift)] transition-all duration-300"
         />
       </div>
       <div className="reveal">
         <Eyebrow>Shop</Eyebrow>
         <h2 className="text-3xl font-extrabold sm:text-4xl">
-          KAYANU 8-Piece Compression Packing Cube Set
+          KAYANU 6-Piece Compression Packing Cube Set
         </h2>
         <p className="mt-4 flex items-baseline gap-3">
           <span className="font-display text-3xl font-bold">{formatPrice(v.price)}</span>
@@ -410,7 +443,7 @@ function Buy() {
         <p className="mt-8 text-sm font-semibold">
           Color: <span className="font-normal text-muted-foreground">{colorLabel}</span>
         </p>
-        <div className="mt-3 flex gap-3">
+        <div className="mt-3 flex flex-wrap gap-3">
           {COLORS.map((c) => (
             <button
               key={c.id}
@@ -451,15 +484,32 @@ function Buy() {
           ))}
         </div>
 
-        {/* Each bundle checks out through its own Stripe payment link. The link asks for
-            the color again (a payment link can't be prefilled), so say it here. */}
-        <a href={v.checkoutUrl} className="btn-primary mt-6 w-full">
-          Buy now — {formatPrice(v.price)}
-        </a>
-        <p className="mt-3 text-center text-sm text-muted-foreground">
-          Secure checkout by Stripe. Select <strong>{colorLabel}</strong> as your set color on the
-          next page
-          {variant === "2-sets" ? " — need more sets? You can change the quantity there." : "."}
+        {/* Buttons: Add to Cart & Buy Now */}
+        <div className="mt-6 flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={handleAddToCart}
+            className="flex-1 flex items-center justify-center gap-2 rounded-full border-2 border-primary bg-card py-3.5 text-sm font-bold text-primary hover:bg-primary/5 transition shadow-xs"
+          >
+            <ShoppingBag className="h-4 w-4" />
+            Add to Cart — {formatPrice(v.price)}
+          </button>
+          <a href={v.checkoutUrl} className="btn-primary flex-1">
+            Buy now
+          </a>
+        </div>
+
+        <div className="mt-3 text-center">
+          <Link
+            to="/product/$slug"
+            params={{ slug: "kayanu-6-piece-compression-set" }}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary underline underline-offset-4 hover:opacity-80"
+          >
+            View full gallery & detailed specifications →
+          </Link>
+        </div>
+
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          Free shipping on orders of $49 or more. 30-day money-back guarantee.
         </p>
 
         <ul className="mt-6 space-y-2 text-sm">
@@ -490,58 +540,234 @@ function Buy() {
             any suitcase.
           </Accordion>
         </div>
+
+        {/* Highlighted Cross-Sell for the Hanging Toiletry Bag */}
+        <div className="mt-8 rounded-2xl border border-primary/25 bg-primary/5 p-4 flex items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-3.5">
+            <img
+              src="https://cf.cjdropshipping.com/20200614/63161490373112.jpg"
+              alt="Hanging Toiletry Bag — XL"
+              className="h-14 w-14 rounded-xl object-cover border border-border"
+            />
+            <div>
+              <span className="block font-bold text-sm text-foreground">Hanging Toiletry Bag — XL</span>
+              <span className="text-xs text-muted-foreground">Waterproof hanging travel organizer • $24.99</span>
+            </div>
+          </div>
+          <a
+            href="#toiletry"
+            className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 whitespace-nowrap shadow-sm"
+          >
+            View bag →
+          </a>
+        </div>
       </div>
     </section>
   );
 }
 
 function CompleteKit() {
+  const { addItem } = useCart();
+  const toiletryVariants = [
+    {
+      id: "black",
+      name: "Stealth Black",
+      sku: "CJBHNSNS16022-Black",
+      vid: "096FDDA3-178F-4B3D-AD72-23C77A241455",
+      image: "https://cf.cjdropshipping.com/20200614/1723440734944.jpg",
+      swatch: "oklch(0.28 0.01 250)",
+    },
+    {
+      id: "grey",
+      name: "Classic Grey",
+      sku: "CJBHNSNS16022-Grey",
+      vid: "42FD7A64-21BB-4269-BAA5-6B94C277D924",
+      image: "https://cf.cjdropshipping.com/20200614/63161490373112.jpg",
+      swatch: "oklch(0.62 0.02 240)",
+    },
+    {
+      id: "navy",
+      name: "Deep Navy",
+      sku: "CJBHNSNS16022-Navy",
+      vid: "70C3CEC3-7AA3-4262-A15B-C12B81B0CAD8",
+      image: "https://cf.cjdropshipping.com/20200614/1651542993816.jpg",
+      swatch: "oklch(0.42 0.07 220)",
+    },
+    {
+      id: "wine-red",
+      name: "Wine Red",
+      sku: "CJBHNSNS16022-Wine Red",
+      vid: "6C20B098-7B81-449F-8C73-CB822D2893C2",
+      image: "https://cf.cjdropshipping.com/20200614/3222559376202.jpg",
+      swatch: "oklch(0.45 0.12 25)",
+    },
+    {
+      id: "purple",
+      name: "Plum Purple",
+      sku: "CJBHNSNS16022-Purple",
+      vid: "58BB1AE1-113A-42B7-86BE-72D39839C582",
+      image: "https://cf.cjdropshipping.com/20200614/1496132150298.jpg",
+      swatch: "oklch(0.48 0.12 310)",
+    },
+    {
+      id: "sky-blue",
+      name: "Sky Blue",
+      sku: "CJBHNSNS16022-Sky Blue",
+      vid: "F567DE21-CBAD-4E45-B384-15FD325BE27C",
+      image: "https://cf.cjdropshipping.com/20200614/66532742498.jpg",
+      swatch: "oklch(0.70 0.10 220)",
+    },
+  ];
+
+  const [selectedToiletryColor, setSelectedToiletryColor] = useState(toiletryVariants[0]);
+  const [activeToiletryView, setActiveToiletryView] = useState<"hanging" | "folded">("hanging");
+  const hangingOpenImg = "https://cf.cjdropshipping.com/20200614/2445321016976.jpg";
+
+  const handleAddToiletry = () => {
+    addItem({
+      id: `hanging-toiletry-bag-xl-${selectedToiletryColor.id}`,
+      productId: "hanging-toiletry-bag-xl",
+      name: "KAYANU Hanging Toiletry Bag — XL",
+      variantName: selectedToiletryColor.name,
+      price: 24.99,
+      image: selectedToiletryColor.image,
+      vid: selectedToiletryColor.vid,
+      checkoutUrl: "https://buy.stripe.com/3cI8wO57wdSNaFv1Jy3wQ03",
+    });
+  };
+
+  const currentToiletryImg = activeToiletryView === "hanging" ? hangingOpenImg : selectedToiletryColor.image;
+
   return (
-    <section id="complete-kit" className="scroll-mt-28 py-20">
-      <div className="mx-auto max-w-6xl px-5">
+    <section id="toiletry" className="scroll-mt-28 py-20 bg-secondary/50">
+      <div className="mx-auto max-w-5xl px-5">
         <div className="reveal text-center">
-          <Eyebrow>Complete your kit</Eyebrow>
-          <h2 className="text-3xl font-extrabold sm:text-4xl">More room. Zero chaos.</h2>
+          <Eyebrow>Travel Companion Gear</Eyebrow>
+          <h2 className="text-3xl font-extrabold sm:text-4xl">KAYANU Hanging Toiletry Bag — XL</h2>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            The add-ons travelers pair with the set. The Complete Kit is a single checkout; solo
-            add-ons check out separately. Everything ships in 3–8 business days.
+            The ideal travel partner for your packing cubes. Unfolds and hangs anywhere to keep full-size bottles, grooming gear, and cosmetics leak-free and off cramped hotel countertops.
           </p>
         </div>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {ADDONS.map((a) => (
-            <div
-              key={a.id}
-              className="reveal flex flex-col overflow-hidden rounded-3xl bg-secondary shadow-[var(--shadow-soft)]"
-            >
+
+        <div className="mt-12 overflow-hidden rounded-3xl bg-card border border-border shadow-[var(--shadow-soft)] grid md:grid-cols-2 items-center">
+          {/* Image side with in-use open & folded switcher */}
+          <div className="relative aspect-square w-full bg-secondary/40 p-4 flex flex-col justify-between">
+            <div className="relative h-full w-full overflow-hidden rounded-2xl">
               <img
-                {...responsiveImage(
-                  a.image,
-                  "(min-width: 1152px) 352px, (min-width: 768px) 33vw, 100vw",
-                )}
-                width={1200}
-                height={900}
-                alt={a.name}
-                loading="lazy"
-                decoding="async"
-                className="aspect-[4/3] w-full object-cover"
+                src={currentToiletryImg}
+                alt={
+                  activeToiletryView === "hanging"
+                    ? "KAYANU Hanging Toiletry Bag XL hanging open with toiletries"
+                    : `KAYANU Hanging Toiletry Bag XL in ${selectedToiletryColor.name}`
+                }
+                className="h-full w-full object-cover transition-all duration-300"
               />
-              <div className="flex flex-1 flex-col p-6">
-                {a.badge ? (
-                  <span className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
-                    {a.badge}
-                  </span>
-                ) : null}
-                <h3 className="font-bold">{a.name}</h3>
-                <p className="mt-2 flex-1 text-sm text-muted-foreground">{a.tagline}</p>
-                <div className="mt-5 flex items-center justify-between">
-                  <span className="text-xl font-extrabold">{formatPrice(a.price)}</span>
-                  <a href={a.checkoutUrl} className="btn-primary">
-                    Buy now
-                  </a>
-                </div>
+              <span className="absolute top-3 left-3 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground tracking-wider shadow-sm">
+                TRAVEL FAVORITE
+              </span>
+            </div>
+
+            {/* Quick open vs folded preview buttons */}
+            <div className="mt-3 flex gap-2">
+              <button
+                onClick={() => setActiveToiletryView("hanging")}
+                className={`flex-1 rounded-lg py-1.5 px-2 text-[11px] font-bold transition border ${
+                  activeToiletryView === "hanging"
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card text-muted-foreground border-border hover:text-foreground"
+                }`}
+              >
+                Open (Hanging)
+              </button>
+              <button
+                onClick={() => setActiveToiletryView("folded")}
+                className={`flex-1 rounded-lg py-1.5 px-2 text-[11px] font-bold transition border ${
+                  activeToiletryView === "folded"
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card text-muted-foreground border-border hover:text-foreground"
+                }`}
+              >
+                Folded ({selectedToiletryColor.name})
+              </button>
+            </div>
+          </div>
+
+          {/* Details side */}
+          <div className="p-8 sm:p-10 flex flex-col justify-center">
+            <span className="text-xs font-bold uppercase tracking-wider text-accent">
+              KAYANU Signature Travel Gear
+            </span>
+            <h3 className="mt-1 text-2xl font-extrabold text-foreground">
+              Hanging Toiletry Bag — XL
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              3 dedicated leak-proof & breathable mesh storage zones, 360° swivel metal hanging hook, and water-resistant wipe-clean fabric.
+            </p>
+
+            {/* Price */}
+            <div className="mt-5 flex items-baseline gap-3">
+              <span className="text-2xl font-extrabold text-foreground">$24.99</span>
+              <span className="text-sm text-muted-foreground line-through">$34.99</span>
+              <span className="text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full">
+                In Stock & Ready to Ship
+              </span>
+            </div>
+
+            {/* Color Swatches */}
+            <div className="mt-6">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Selected Color: <span className="text-foreground font-extrabold">{selectedToiletryColor.name}</span>
+              </p>
+              <div className="mt-2.5 flex flex-wrap gap-2.5">
+                {toiletryVariants.map((v) => (
+                  <button
+                    key={v.id}
+                    onClick={() => setSelectedToiletryColor(v)}
+                    title={v.name}
+                    aria-label={v.name}
+                    className={`flex items-center gap-1.5 rounded-xl border-2 px-3 py-1.5 text-xs font-semibold transition ${
+                      selectedToiletryColor.id === v.id
+                        ? "border-primary bg-primary/10 text-primary shadow-xs"
+                        : "border-border/80 bg-card hover:border-foreground/30 text-foreground"
+                    }`}
+                  >
+                    <span
+                      className="h-3.5 w-3.5 rounded-full border border-black/20"
+                      style={{ background: v.swatch }}
+                    />
+                    <span>{v.name}</span>
+                  </button>
+                ))}
               </div>
             </div>
-          ))}
+
+            {/* Buttons */}
+            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={handleAddToiletry}
+                className="flex-1 flex items-center justify-center gap-2 rounded-xl border-2 border-primary bg-card py-3 text-xs font-bold text-primary hover:bg-primary/5 transition shadow-xs"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                Add to Cart — $24.99
+              </button>
+              <a
+                href="https://buy.stripe.com/3cI8wO57wdSNaFv1Jy3wQ03"
+                className="btn-primary !py-3 !px-5 text-xs font-bold flex-1 text-center"
+              >
+                Buy now
+              </a>
+            </div>
+
+            <div className="mt-4 text-center">
+              <Link
+                to="/product/$slug"
+                params={{ slug: "hanging-toiletry-bag-xl" }}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary underline underline-offset-4 hover:opacity-85"
+              >
+                View full product page, 360° hook & gallery →
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -550,10 +776,10 @@ function CompleteKit() {
 
 function Comparison() {
   const rows = [
-    ["Space saved", "Compresses clothes with a 2nd zipper", "Organizes, no compression", "None"],
-    ["Organization", "4 sizes + shoe & laundry bags", "Sorted by cube", "Everything mixed"],
-    ["Zipper quality", "Quality-checked before shipping", "Varies", "—"],
-    ["Dirty-clothes separation", "Dedicated laundry bag", "Rarely included", "Not at all"],
+    ["Space saved", "Compresses clothes with secondary perimeter zipper", "Organizes, no compression", "None"],
+    ["Organization", "5 graduated sizes + shoe/laundry bag", "Sorted by cube", "Everything mixed"],
+    ["Zipper quality", "Heavy-duty double compression zippers", "Varies", "—"],
+    ["Dirty-clothes separation", "Included drawstring shoe/laundry bag", "Rarely included", "Not at all"],
   ];
   return (
     <section className="mx-auto max-w-5xl px-5 py-20">

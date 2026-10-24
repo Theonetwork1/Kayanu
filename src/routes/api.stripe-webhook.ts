@@ -88,14 +88,48 @@ export const Route = createFileRoute("/api/stripe-webhook")({
 
           if (isPaid) {
             console.log("Order paid:", order.number, order.total);
-            const owner = process.env["ORDER_NOTIFY_EMAIL"];
+            const owner =
+              process.env["ORDER_NOTIFY_EMAIL"] ||
+              process.env["ADMIN_EMAIL"] ||
+              process.env["OWNER_EMAIL"];
+
             if (owner && cj && (cj.status === "manual" || cj.status === "retry")) {
-              await sendMail(ownerCjManual(order, cj.reason, owner, cj.status === "retry"));
+              try {
+                await sendMail(ownerCjManual(order, cj.reason, owner, cj.status === "retry"));
+              } catch (cjMailErr) {
+                console.error("Resend error sending CJ manual alert to owner:", cjMailErr);
+              }
             }
+
+            let customerSent = false;
+            let ownerSent = false;
+
             const customerMail = orderConfirmation(order);
-            if (customerMail) await sendMail(customerMail);
-            if (owner) await sendMail(ownerNewOrder(order, owner));
-            else console.warn("ORDER_NOTIFY_EMAIL not set: owner notification skipped");
+            if (customerMail) {
+              try {
+                await sendMail(customerMail);
+                customerSent = true;
+                console.log(`Confirmation email sent via Resend to customer: ${order.email}`);
+              } catch (customerErr) {
+                console.error("Resend error sending customer confirmation email:", customerErr);
+              }
+            }
+
+            if (owner) {
+              try {
+                await sendMail(ownerNewOrder(order, owner));
+                ownerSent = true;
+                console.log(`Notification email sent via Resend to owner: ${owner}`);
+              } catch (ownerErr) {
+                console.error("Resend error sending owner notification email:", ownerErr);
+              }
+            } else {
+              console.warn("ORDER_NOTIFY_EMAIL (or ADMIN_EMAIL / OWNER_EMAIL) not set in Vercel: owner notification skipped");
+            }
+
+            if (!customerSent && !ownerSent && (customerMail || owner)) {
+              throw new Error("Failed to send transactional emails via Resend");
+            }
           } else {
             const cartMail = abandonedCart(order);
             if (cartMail) await sendMail(cartMail);

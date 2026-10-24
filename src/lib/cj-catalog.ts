@@ -6,7 +6,15 @@
 // gets an email asking to place that order manually.
 
 // Set color values sent by the Stripe "Set color" dropdown (custom field key "color").
-export type SetColor = "charcoal" | "oceanteal" | "sand";
+export type SetColor =
+  | "charcoal"
+  | "oceanteal"
+  | "sand"
+  | "cloudgray"
+  | "crimsonred"
+  | "sagegreen"
+  | "skyblue"
+  | "blossompink";
 
 type Component =
   // One CJ variant per set color.
@@ -14,17 +22,18 @@ type Component =
   // A single CJ variant (no color).
   | { kind: "fixed"; vid: string | null; qty: number };
 
-// Selected with the CJ catalog (2026-10-21). CJ has no matching compression set in its U.S.
-// warehouse, so everything ships from China: a CJ order has a single origin, and the
-// Complete Kit (set + vacuum bags) must leave from one warehouse.
-//
-// Set: "Compressible Travel Storage Bags Set" — CJYD2790879, pid 2603171149031616200,
-// "8pc Set" variants ($4.44, 410 g). Order a sample first: CJ lists 8 pieces in total,
-// while the site describes 8 cubes + shoe pouch + laundry bag.
+// Selected with the CJ catalog (2026-10-21).
+// Set: "Travel Can Be Compression Storage Bag Suit With Shoe Bag Mesh Visual Luggage Organizing"
+// SKU CJYD1961037, pid 1752620057236086784.
 export const CJ_SET_VIDS: Record<SetColor, string | null> = {
-  charcoal: "2603171149031618600", // Gray 8pc Set
-  oceanteal: "2603171149031618900", // Blue 8pc Set
-  sand: "2603171149031617900", // Beige 8pc Set
+  sand: "1752620058599235584", // Beige Six Piece Set (CJYD196103714NM)
+  charcoal: "1752620058049781760", // Black Six Piece Set (CJYD196103707GT)
+  oceanteal: "1752620058444046336", // Navy Blue Six Piece Set (CJYD196103712LO)
+  cloudgray: "1752620058217553920", // Gray Six Piece Set (CJYD196103709IR)
+  crimsonred: "1752620058142056448", // Red Six Piece Set (CJYD196103708HS)
+  sagegreen: "1752620058293051392", // Green Six Piece Set (CJYD196103710JQ)
+  skyblue: "1752620058368548864", // Sky Blue Six Piece Set (CJYD196103711KP)
+  blossompink: "1752620058519543808", // Pink Six Piece Set (CJYD196103713MN)
 };
 
 // Stripe product id → CJ components shipped for one unit of that product.
@@ -34,7 +43,7 @@ export const CJ_PRODUCTS: Record<string, { label: string; components: Component[
   // "Travel Sized Roll Up Compression Bag" — CJYD3095685, pid 2608260124491616700: pump-free
   // roll-up bags sold one by one (CJ's 12-bag sets include an electric pump, which makes
   // them "battery" goods and doubles shipping). 4 + 4 + 4 sizes = the advertised 12 pack,
-  // $4.80 and ~750 g in total. New on CJ (no other store lists it yet): sample it first.
+  // $4.80 and ~750 g in total.
   prod_VTzj7CDzYr5gR2: {
     label: "Vacuum Travel Bags — 12 Pack",
     components: [
@@ -43,10 +52,10 @@ export const CJ_PRODUCTS: Record<string, { label: string; components: Component[
       { kind: "fixed", vid: "2608260124491617603", qty: 4 }, // 50×70 cm
     ],
   },
-  // "Travel Hanging Toiletry Bag … Large Makeup Bag" — CJCZ2111531, Gray ($11.02, 200 g).
+  // "Multi function storage bag" — CJBHNSNS16022, Grey variant (CJBHNSNS16022-Grey).
   prod_VTzjxkKc2C396N: {
     label: "Hanging Toiletry Bag — XL",
-    components: [{ kind: "fixed", vid: "1824032070281613313", qty: 1 }],
+    components: [{ kind: "fixed", vid: "42FD7A64-21BB-4269-BAA5-6B94C277D924", qty: 1 }],
   },
 };
 
