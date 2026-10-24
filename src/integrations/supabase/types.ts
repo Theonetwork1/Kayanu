@@ -14,13 +14,107 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cj_connection: {
+        Row: {
+          access_expires_at: string | null
+          access_token: string | null
+          id: string
+          open_id: string | null
+          processor_secret: string | null
+          processor_url: string | null
+          refresh_expires_at: string | null
+          refresh_token: string | null
+          token_lock_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_expires_at?: string | null
+          access_token?: string | null
+          id?: string
+          open_id?: string | null
+          processor_secret?: string | null
+          processor_url?: string | null
+          refresh_expires_at?: string | null
+          refresh_token?: string | null
+          token_lock_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_expires_at?: string | null
+          access_token?: string | null
+          id?: string
+          open_id?: string | null
+          processor_secret?: string | null
+          processor_url?: string | null
+          refresh_expires_at?: string | null
+          refresh_token?: string | null
+          token_lock_until?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cj_webhook_inbox: {
+        Row: {
+          attempts: number
+          created_at: string
+          last_error: string | null
+          locked_until: string | null
+          message_id: string
+          next_attempt_at: string
+          payload: Json
+          processed_at: string | null
+          status: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          last_error?: string | null
+          locked_until?: string | null
+          message_id: string
+          next_attempt_at?: string
+          payload: Json
+          processed_at?: string | null
+          status?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          last_error?: string | null
+          locked_until?: string | null
+          message_id?: string
+          next_attempt_at?: string
+          payload?: Json
+          processed_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cj_acquire_token_lock: { Args: never; Returns: boolean }
+      cj_claim_event: {
+        Args: { event_id: string }
+        Returns: {
+          attempts: number
+          created_at: string
+          last_error: string | null
+          locked_until: string | null
+          message_id: string
+          next_attempt_at: string
+          payload: Json
+          processed_at: string | null
+          status: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "cj_webhook_inbox"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       [_ in never]: never
