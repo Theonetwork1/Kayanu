@@ -25,7 +25,7 @@ export const VARIANTS: {
     includes: "5 compression cubes + 1 drawstring shoe/laundry bag (6 pieces total)",
     price: 34.99,
     compareAt: 44.99,
-    checkoutUrl: "https://buy.stripe.com/aFa00i6bA7upeVLdsg3wQ05",
+    checkoutUrl: "https://buy.stripe.com/aFabJ09nMeWR9Br87W3wQ09",
   },
   {
     id: "2-sets",
@@ -33,7 +33,7 @@ export const VARIANTS: {
     includes: "10 compression cubes + 2 drawstring shoe/laundry bags (12 pieces total) · Free shipping",
     price: 59.99,
     compareAt: 89.98,
-    checkoutUrl: "https://buy.stripe.com/bJe28q0Rg9Cx6pf4VK3wQ06",
+    checkoutUrl: "https://buy.stripe.com/7sYdR8arQ6ql8xnbk83wQ0a",
     badge: "MOST POPULAR",
   },
 ];
@@ -70,7 +70,7 @@ export const ADDONS: Addon[] = [
       "Hangs from any hook — built for cruise cabins and tiny bathrooms with no counter space. Every bottle in its place.",
     price: 24.99,
     image: "https://cf.cjdropshipping.com/20200614/1723440734944.jpg", // Stealth Black
-    checkoutUrl: "https://buy.stripe.com/5kQcN47fE3e928Z3RG3wQ07",
+    checkoutUrl: "https://buy.stripe.com/5kQfZg2Zo01X28Z3RG3wQ0b",
     badge: "TRAVEL FAVORITE",
   },
 ];
@@ -81,7 +81,7 @@ export const ADDONS: Addon[] = [
 export const WELCOME_CODE: string | null = null;
 
 export const SHIPPING_FLAT = 4.95;
-export const FREE_SHIPPING_THRESHOLD = 49;
+export const FREE_SHIPPING_THRESHOLD = 50;
 
 export const getVariant = (id: VariantId) => VARIANTS.find((v) => v.id === id)!;
 export const formatPrice = (n: number) => `$${n.toFixed(2)}`;

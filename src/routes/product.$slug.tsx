@@ -293,7 +293,7 @@ function ProductDetailPage() {
               </div>
 
               <p className="text-center text-xs text-muted-foreground">
-                Free shipping unlocked on orders of $49 or more. 30-day money-back guarantee.
+                Free shipping unlocked on orders of $50 or more. 30-day money-back guarantee.
               </p>
             </div>
 

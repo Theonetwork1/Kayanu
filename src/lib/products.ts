@@ -137,7 +137,7 @@ export const PRODUCTS: StoreProduct[] = [
         colorSwatch: "oklch(0.78 0.10 350)",
       },
     ],
-    defaultCheckoutUrl: "https://buy.stripe.com/aFa00i6bA7upeVLdsg3wQ05",
+    defaultCheckoutUrl: "https://buy.stripe.com/aFabJ09nMeWR9Br87W3wQ09",
     features: [
       "Secondary perimeter compression zipper removes up to 60% of excess air volume",
       "Water-repellent tear-resistant woven nylon with breathable diamond mesh panels",
@@ -243,7 +243,7 @@ export const PRODUCTS: StoreProduct[] = [
         colorSwatch: "oklch(0.70 0.10 220)",
       },
     ],
-    defaultCheckoutUrl: "https://buy.stripe.com/5kQcN47fE3e928Z3RG3wQ07",
+    defaultCheckoutUrl: "https://buy.stripe.com/5kQfZg2Zo01X28Z3RG3wQ0b",
     features: [
       "Sturdy 360° swivel metal hook hangs securely on towel racks, doors, or shower rods",
       "Upper leak-proof transparent PVC compartment keeps toothbrushes, paste & liquids sealed",

@@ -47,7 +47,7 @@ const insideImg = "/images/products/kayanu-6pc-lineup.png"; // All 6 pieces stan
 
 const TITLE = "Compression Packing Cubes — 6-Piece Travel Set | KAYANU";
 const DESC =
-  "Pack twice as much: 5 graduated compression cubes plus a dedicated drawstring shoe/laundry bag (6 pieces total). Fits carry-on and checked luggage. Free U.S. shipping over $49, 30-day returns.";
+  "Pack twice as much: 5 graduated compression cubes plus a dedicated drawstring shoe/laundry bag (6 pieces total). Fits carry-on and checked luggage. Free U.S. shipping on orders $50+, 30-day returns.";
 const PRODUCT_NAME = "KAYANU 6-Piece Compression Packing Cube Set";
 
 const FAQ: [string, string][] = [
@@ -81,7 +81,7 @@ const FAQ: [string, string][] = [
 // FAQ). Mirrors the visible page and config.ts: no ratings, nothing invented.
 const shippingDetails = (price: number) => ({
   "@type": "OfferShippingDetails",
-  shippingRate: { "@type": "MonetaryAmount", value: price >= 49 ? 0 : 4.95, currency: "USD" },
+  shippingRate: { "@type": "MonetaryAmount", value: price >= 50 ? 0 : 4.95, currency: "USD" },
   shippingDestination: { "@type": "DefinedRegion", addressCountry: "US" },
   deliveryTime: {
     "@type": "ShippingDeliveryTime",
@@ -553,12 +553,12 @@ function Buy() {
         </div>
 
         <p className="mt-3 text-center text-xs text-muted-foreground">
-          Free shipping on orders of $49 or more. 30-day money-back guarantee.
+          Free shipping on orders of $50 or more. 30-day money-back guarantee.
         </p>
 
         <ul className="mt-6 space-y-2 text-sm">
           {[
-            "FREE shipping on orders $49+ (otherwise $4.95)",
+            "FREE shipping on orders $50+ (otherwise $4.95)",
             "Processed in 1–2 business days, delivered in 3–8 days",
             "30-day happiness guarantee — full refund",
             "Quality-checked zippers before shipping",
@@ -676,7 +676,7 @@ function CompleteKit() {
       price: 24.99,
       image: selectedToiletryColor.image,
       vid: selectedToiletryColor.vid,
-      checkoutUrl: "https://buy.stripe.com/5kQcN47fE3e928Z3RG3wQ07",
+      checkoutUrl: "https://buy.stripe.com/5kQfZg2Zo01X28Z3RG3wQ0b",
     });
   };
 
@@ -795,7 +795,7 @@ function CompleteKit() {
                 Add to Cart — $24.99
               </button>
               <a
-                href="https://buy.stripe.com/5kQcN47fE3e928Z3RG3wQ07"
+                href="https://buy.stripe.com/5kQfZg2Zo01X28Z3RG3wQ0b"
                 className="btn-primary !py-3 !px-5 text-xs font-bold flex-1 text-center"
               >
                 Buy now
@@ -928,7 +928,7 @@ function MobileBuyBar() {
         Shop the set — from {formatPrice(getVariant("1-set").price)}
       </a>
       <p className="mt-1.5 text-center text-xs text-muted-foreground">
-        Free U.S. shipping over $49 · 30-day returns
+        Free U.S. shipping on orders $50+ · 30-day returns
       </p>
     </div>
   );

@@ -336,7 +336,7 @@ export function abandonedCart(o: Order): Mail | null {
     p("Your KAYANU packing cubes are still waiting. Finish your order in a few clicks:"),
     itemsTable(o, false),
     button("Complete my order", o.recoveryUrl),
-    small("Orders over $49 ship free. 30-day happiness guarantee."),
+    small("Orders over $50 ship free. 30-day happiness guarantee."),
   ].join("");
   return {
     to: o.email,

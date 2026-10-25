@@ -58,7 +58,7 @@ export function CartDrawer() {
     if (fallbackItem?.checkoutUrl) {
       window.location.href = appendPromo(fallbackItem.checkoutUrl);
     } else {
-      window.location.href = appendPromo("https://buy.stripe.com/aFa00i6bA7upeVLdsg3wQ05");
+      window.location.href = appendPromo("https://buy.stripe.com/aFabJ09nMeWR9Br87W3wQ09");
     }
   };
 
