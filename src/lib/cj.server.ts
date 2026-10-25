@@ -130,7 +130,7 @@ export type PaidSession = {
     country?: string | null;
   };
   color?: string | undefined;
-  lines: { product: string; qty: number; description: string }[];
+  lines: { product: string; priceId?: string | undefined; qty: number; description: string }[];
 };
 
 export type CjOrderBody = Record<string, unknown> & {
@@ -162,7 +162,7 @@ export function buildCjOrder(
 
   const qtyByVid = new Map<string, number>();
   for (const line of s.lines) {
-    const product = CJ_PRODUCTS[line.product];
+    const product = (line.priceId && CJ_PRODUCTS[line.priceId]) || CJ_PRODUCTS[line.product];
     if (!product)
       return {
         ok: false,
@@ -171,17 +171,18 @@ export function buildCjOrder(
     for (const c of product.components) {
       let vid: string | null;
       if (c.kind === "set") {
-        if (!s.color || !(s.color in CJ_SET_VIDS)) {
+        const color = s.color ?? "sand";
+        if (!(color in CJ_SET_VIDS)) {
           return { ok: false, reason: `Missing or unknown set color "${s.color ?? ""}"` };
         }
-        vid = CJ_SET_VIDS[s.color as SetColor];
+        vid = CJ_SET_VIDS[color as SetColor];
       } else {
         vid = c.vid;
       }
       if (!vid)
         return {
           ok: false,
-          reason: `CJ vid not set in cj-catalog.ts for ${product.label}${c.kind === "set" ? ` (${s.color})` : ""}`,
+          reason: `CJ vid not set in cj-catalog.ts for ${product.label}${c.kind === "set" ? ` (${s.color ?? "sand"})` : ""}`,
         };
       qtyByVid.set(vid, (qtyByVid.get(vid) ?? 0) + c.qty * line.qty);
     }
@@ -306,6 +307,7 @@ export async function loadPaidSession(sessionId: string): Promise<PaidSession> {
     lines: (s.line_items?.data ?? []).map((li) => ({
       product:
         typeof li.price?.product === "string" ? li.price.product : (li.price?.product?.id ?? ""),
+      priceId: li.price?.id ?? undefined,
       qty: li.quantity ?? 1,
       description: li.description ?? "Item",
     })),

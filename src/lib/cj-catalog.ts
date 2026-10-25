@@ -38,12 +38,15 @@ export const CJ_SET_VIDS: Record<SetColor, string | null> = {
 
 // Stripe product id → CJ components shipped for one unit of that product.
 export const CJ_PRODUCTS: Record<string, { label: string; components: Component[] }> = {
+  // Live Stripe product & price mappings
+  prod_VVUbrJP3ImuyQ2: { label: "KAYANU 6-Piece Compression Packing Cube Set", components: [{ kind: "set", qty: 1 }] },
+  price_1UUTcSC6uDUApeMB1sUHPApA: { label: "1 Set (6 Pieces)", components: [{ kind: "set", qty: 1 }] },
+  price_1UUTcTC6uDUApeMBKuJuBnBN: { label: "2 Sets Bundle (12 Pieces)", components: [{ kind: "set", qty: 2 }] },
+
+  // Legacy mappings
   prod_VTzjI2JA2uorKe: { label: "1 Set", components: [{ kind: "set", qty: 1 }] },
   prod_VTzjxle0Qj1kVQ: { label: "2 Sets", components: [{ kind: "set", qty: 2 }] },
-  // "Travel Sized Roll Up Compression Bag" — CJYD3095685, pid 2608260124491616700: pump-free
-  // roll-up bags sold one by one (CJ's 12-bag sets include an electric pump, which makes
-  // them "battery" goods and doubles shipping). 4 + 4 + 4 sizes = the advertised 12 pack,
-  // $4.80 and ~750 g in total.
+  // "Travel Sized Roll Up Compression Bag" — CJYD3095685, pid 2608260124491616700
   prod_VTzj7CDzYr5gR2: {
     label: "Vacuum Travel Bags — 12 Pack",
     components: [
