@@ -25,7 +25,7 @@ export const VARIANTS: {
     includes: "5 compression cubes + 1 drawstring shoe/laundry bag (6 pieces total)",
     price: 34.99,
     compareAt: 44.99,
-    checkoutUrl: "https://buy.stripe.com/dRm5kC57waGBcND87W3wQ00",
+    checkoutUrl: "https://buy.stripe.com/aFa00i6bA7upeVLdsg3wQ05",
   },
   {
     id: "2-sets",
@@ -33,7 +33,7 @@ export const VARIANTS: {
     includes: "10 compression cubes + 2 drawstring shoe/laundry bags (12 pieces total) · Free shipping",
     price: 59.99,
     compareAt: 89.98,
-    checkoutUrl: "https://buy.stripe.com/cNi28qgQe9Cx8xnag43wQ01",
+    checkoutUrl: "https://buy.stripe.com/bJe28q0Rg9Cx6pf4VK3wQ06",
     badge: "MOST POPULAR",
   },
 ];
@@ -70,7 +70,7 @@ export const ADDONS: Addon[] = [
       "Hangs from any hook — built for cruise cabins and tiny bathrooms with no counter space. Every bottle in its place.",
     price: 24.99,
     image: "https://cf.cjdropshipping.com/20200614/1723440734944.jpg", // Stealth Black
-    checkoutUrl: "https://buy.stripe.com/3cI8wO57wdSNaFv1Jy3wQ03",
+    checkoutUrl: "https://buy.stripe.com/5kQcN47fE3e928Z3RG3wQ07",
     badge: "TRAVEL FAVORITE",
   },
 ];

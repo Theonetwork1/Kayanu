@@ -13,6 +13,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { trackPurchase } from "@/lib/meta-pixel";
 import { SiteShell, useReveal } from "@/components/Layout";
 import {
   ADDONS,
@@ -172,8 +173,51 @@ const Eyebrow = ({ children }: { children: React.ReactNode }) => (
 
 function Home() {
   useReveal();
+  const { clearCart } = useCart();
+  const [showOrderSuccess, setShowOrderSuccess] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("order") === "success") {
+      setShowOrderSuccess(true);
+      clearCart();
+      const sessionId = params.get("session_id") || "completed";
+      const trackedKey = `kayanu_tracked_${sessionId}`;
+      if (!sessionStorage.getItem(trackedKey)) {
+        sessionStorage.setItem(trackedKey, "1");
+        trackPurchase(39.99, "USD");
+      }
+    }
+  }, [clearCart]);
+
   return (
     <SiteShell>
+      {showOrderSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+          <div className="card-soft relative max-w-md w-full p-6 text-center animate-in fade-in zoom-in duration-200">
+            <button
+              onClick={() => setShowOrderSuccess(false)}
+              className="absolute right-4 top-4 p-1 rounded-full hover:bg-muted"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent/20 text-accent">
+              <Check className="h-7 w-7" />
+            </div>
+            <h3 className="text-2xl font-bold">Thank You For Your Order!</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Your payment has been successfully processed. We've sent a confirmation email with all the details.
+            </p>
+            <button
+              onClick={() => setShowOrderSuccess(false)}
+              className="btn-primary mt-6 w-full"
+            >
+              Continue Browsing
+            </button>
+          </div>
+        </div>
+      )}
       <Hero />
       <Problem />
       <HowItWorks />
@@ -632,7 +676,7 @@ function CompleteKit() {
       price: 24.99,
       image: selectedToiletryColor.image,
       vid: selectedToiletryColor.vid,
-      checkoutUrl: "https://buy.stripe.com/3cI8wO57wdSNaFv1Jy3wQ03",
+      checkoutUrl: "https://buy.stripe.com/5kQcN47fE3e928Z3RG3wQ07",
     });
   };
 
@@ -751,7 +795,7 @@ function CompleteKit() {
                 Add to Cart — $24.99
               </button>
               <a
-                href="https://buy.stripe.com/3cI8wO57wdSNaFv1Jy3wQ03"
+                href="https://buy.stripe.com/5kQcN47fE3e928Z3RG3wQ07"
                 className="btn-primary !py-3 !px-5 text-xs font-bold flex-1 text-center"
               >
                 Buy now

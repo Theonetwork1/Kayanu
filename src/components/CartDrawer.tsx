@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { formatPrice, FREE_SHIPPING_THRESHOLD } from "@/config";
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Truck } from "lucide-react";
+import { trackInitiateCheckout } from "@/lib/meta-pixel";
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Truck, Tag } from "lucide-react";
 
 export function CartDrawer() {
   const {
@@ -17,6 +18,8 @@ export function CartDrawer() {
   } = useCart();
 
   const [checkingOut, setCheckingOut] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [showPromoInput, setShowPromoInput] = useState(false);
 
   if (!isCartOpen) return null;
 
@@ -24,7 +27,16 @@ export function CartDrawer() {
   const progressPercent = Math.min(100, Math.round((subtotal / FREE_SHIPPING_THRESHOLD) * 100));
 
   const handleCheckout = async () => {
+    trackInitiateCheckout(total, totalItems);
     setCheckingOut(true);
+
+    const appendPromo = (targetUrl: string) => {
+      const code = promoCode.trim();
+      if (!code) return targetUrl;
+      const sep = targetUrl.includes("?") ? "&" : "?";
+      return `${targetUrl}${sep}prefilled_promo_code=${encodeURIComponent(code)}`;
+    };
+
     try {
       // 1. Try dynamic multi-item server checkout if configured
       const res = await fetch("/api/checkout", {
@@ -34,7 +46,7 @@ export function CartDrawer() {
       });
       const data = await res.json();
       if (data.url) {
-        window.location.href = data.url;
+        window.location.href = appendPromo(data.url);
         return;
       }
     } catch {
@@ -44,9 +56,9 @@ export function CartDrawer() {
     // 2. Direct fallback to Stripe checkout URL of primary item or default
     const fallbackItem = items.find((i) => i.checkoutUrl) || items[0];
     if (fallbackItem?.checkoutUrl) {
-      window.location.href = fallbackItem.checkoutUrl;
+      window.location.href = appendPromo(fallbackItem.checkoutUrl);
     } else {
-      window.location.href = "https://buy.stripe.com/dRm5kC57waGBcND87W3wQ00";
+      window.location.href = appendPromo("https://buy.stripe.com/aFa00i6bA7upeVLdsg3wQ05");
     }
   };
 
@@ -184,6 +196,54 @@ export function CartDrawer() {
           {/* Footer Summary & Checkout */}
           {items.length > 0 && (
             <div className="border-t border-border bg-card p-6 shadow-inner">
+              {/* Promo code field */}
+              <div className="mb-4 rounded-xl border border-border/60 bg-muted/30 p-3">
+                {!showPromoInput && !promoCode ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowPromoInput(true)}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                  >
+                    <Tag className="h-3.5 w-3.5" />
+                    <span>Have a promo code?</span>
+                  </button>
+                ) : (
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1">
+                        <Tag className="h-3 w-3" /> Promo Code
+                      </label>
+                      {promoCode && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPromoCode("");
+                            setShowPromoInput(false);
+                          }}
+                          className="text-[10px] text-muted-foreground hover:text-foreground"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="e.g. TEST1"
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value.toUpperCase().trim())}
+                        className="flex-1 rounded-lg border border-input bg-background px-3 py-1.5 text-xs uppercase font-mono font-bold tracking-wider placeholder:normal-case placeholder:font-sans placeholder:font-normal focus:outline-hidden focus:ring-1 focus:ring-primary"
+                      />
+                    </div>
+                    {promoCode && (
+                      <p className="mt-1.5 text-[11px] font-medium text-emerald-600">
+                        ✓ Code &ldquo;{promoCode}&rdquo; will be applied at checkout
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between text-muted-foreground">
                   <span>Subtotal</span>

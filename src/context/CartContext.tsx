@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_FLAT } from "@/config";
+import { trackAddToCart } from "@/lib/meta-pixel";
 
 export type CartItem = {
   id: string; // `${productId}-${variantId}`
@@ -70,6 +71,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, { ...item, quantity }];
     });
+    trackAddToCart({ name: item.name, price: item.price, quantity, id: item.id });
     setIsCartOpen(true);
   };
 
