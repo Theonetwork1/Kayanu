@@ -13,7 +13,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { trackPurchase } from "@/lib/meta-pixel";
+import { trackPurchase, getLastCheckoutTotal } from "@/lib/meta-pixel";
 import { SiteShell, useReveal } from "@/components/Layout";
 import {
   ADDONS,
@@ -186,7 +186,7 @@ function Home() {
       const trackedKey = `kayanu_tracked_${sessionId}`;
       if (!sessionStorage.getItem(trackedKey)) {
         sessionStorage.setItem(trackedKey, "1");
-        trackPurchase(39.99, "USD");
+        trackPurchase(getLastCheckoutTotal(), "USD");
       }
     }
   }, [clearCart]);

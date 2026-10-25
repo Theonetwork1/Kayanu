@@ -53,7 +53,14 @@ export function trackAddToCart(item: { name: string; price: number; quantity?: n
   });
 }
 
+const LAST_CHECKOUT_KEY = "kayanu_last_checkout_total";
+
 export function trackInitiateCheckout(total: number, itemsCount: number) {
+  try {
+    window.localStorage.setItem(LAST_CHECKOUT_KEY, String(total));
+  } catch {
+    /* storage unavailable */
+  }
   trackEvent("InitiateCheckout", {
     value: total,
     currency: "USD",
@@ -61,9 +68,20 @@ export function trackInitiateCheckout(total: number, itemsCount: number) {
   });
 }
 
-export function trackPurchase(value: number, currency = "USD") {
-  trackEvent("Purchase", {
-    value,
-    currency,
-  });
+/** Returns the cart total saved at checkout start (real order value), if any. */
+export function getLastCheckoutTotal(): number | undefined {
+  try {
+    const v = Number(window.localStorage.getItem(LAST_CHECKOUT_KEY));
+    return Number.isFinite(v) && v > 0 ? v : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function trackPurchase(value?: number, currency = "USD") {
+  if (value && value > 0) {
+    trackEvent("Purchase", { value, currency });
+  } else {
+    trackEvent("Purchase");
+  }
 }

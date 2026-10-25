@@ -1,8 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { SiteShell } from "@/components/Layout";
 import { PRODUCTS, getProductBySlug, type StoreProduct, type ProductVariant } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
+import { trackViewContent } from "@/lib/meta-pixel";
 import { canonicalLink, formatPrice, STORE_NAME } from "@/config";
 import {
   Check,
@@ -70,6 +71,14 @@ function ProductDetailPage() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [overrideImage, setOverrideImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    trackViewContent({
+      name: product.shortName || product.name,
+      price: product.variants[0].price,
+      id: product.slug,
+    });
+  }, [product.slug]);
 
   // If variant changes, change image to match the variant
   const handleSelectVariant = (v: ProductVariant) => {
