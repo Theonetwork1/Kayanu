@@ -22,32 +22,37 @@ export const VARIANTS: {
   {
     id: "1-set",
     label: "1 Set",
-    includes: "8 cubes + shoe pouch + laundry bag",
-    price: 29.99,
-    compareAt: 39.99,
+    includes: "5 compression cubes + 1 drawstring shoe/laundry bag (6 pieces total)",
+    price: 34.99,
+    compareAt: 44.99,
     checkoutUrl: "https://buy.stripe.com/dRm5kC57waGBcND87W3wQ00",
   },
   {
     id: "2-sets",
     label: "2 Sets",
-    includes: "16 cubes + 2 shoe pouches + 2 laundry bags · Free shipping",
-    price: 49.99,
-    compareAt: 59.98,
+    includes: "10 compression cubes + 2 drawstring shoe/laundry bags (12 pieces total) · Free shipping",
+    price: 59.99,
+    compareAt: 89.98,
     checkoutUrl: "https://buy.stripe.com/cNi28qgQe9Cx8xnag43wQ01",
     badge: "MOST POPULAR",
   },
 ];
 
 export const COLORS = [
-  { id: "charcoal", label: "Charcoal", swatch: "oklch(0.32 0.01 250)" },
-  { id: "ocean-teal", label: "Ocean Teal", swatch: "oklch(0.45 0.07 200)" },
-  { id: "sand", label: "Sand", swatch: "oklch(0.84 0.04 80)" },
+  { id: "sand", label: "Sand (Beige)", swatch: "oklch(0.84 0.04 80)" },
+  { id: "charcoal", label: "Charcoal (Black)", swatch: "oklch(0.32 0.01 250)" },
+  { id: "ocean-teal", label: "Ocean Teal (Navy)", swatch: "oklch(0.45 0.07 200)" },
+  { id: "cloud-gray", label: "Cloud Gray", swatch: "oklch(0.65 0.02 240)" },
+  { id: "crimson-red", label: "Crimson Red", swatch: "oklch(0.55 0.20 25)" },
+  { id: "sage-green", label: "Sage Green", swatch: "oklch(0.60 0.12 145)" },
+  { id: "sky-blue", label: "Sky Blue", swatch: "oklch(0.70 0.10 220)" },
+  { id: "blossom-pink", label: "Blossom Pink", swatch: "oklch(0.78 0.10 350)" },
 ] as const;
 export type ColorId = (typeof COLORS)[number]["id"];
 
 // Add-on products (upsells) — each is sold through its own Stripe payment link.
-// The kit link checks out the 1 Set + the vacuum bags in a single payment, with free
-// shipping and a set-color dropdown.
+// Note: "Vacuum Bags" and "The Complete Kit" are hidden per store request
+// until confirmed suppliers are established.
 export type Addon = {
   id: string;
   name: string;
@@ -59,32 +64,14 @@ export type Addon = {
 };
 export const ADDONS: Addon[] = [
   {
-    id: "kit-set-vacuum",
-    name: "The Complete Kit — Set + Vacuum Bags",
-    tagline:
-      "The 8-piece set plus the 12 vacuum bags in one checkout — and at $49.98 it ships free.",
-    price: 49.98,
-    image: "https://s.alicdn.com/@sc04/kf/H98ada98627f3418784ac2191c9f120b0R.jpg",
-    checkoutUrl: "https://buy.stripe.com/00w5kCczY6qlbJz0Fu3wQ04",
-    badge: "SHIPS FREE",
-  },
-  {
-    id: "vacuum-bags",
-    name: "Vacuum Travel Bags — 12 Pack",
-    tagline:
-      "For the bulky stuff cubes can't tame — sweaters, jackets, coats. Roll the air out; no vacuum cleaner needed.",
-    price: 19.99,
-    image: "https://s.alicdn.com/@sc04/kf/Hf089375455364446bca22cbbd3ee3660q.jpg",
-    checkoutUrl: "https://buy.stripe.com/00w4gyfMa7up4h74VK3wQ02",
-  },
-  {
     id: "toiletry-xl",
-    name: "Hanging Toiletry Bag — XL",
+    name: "KAYANU Hanging Toiletry Bag — XL",
     tagline:
       "Hangs from any hook — built for cruise cabins and tiny bathrooms with no counter space. Every bottle in its place.",
     price: 24.99,
-    image: "https://s.alicdn.com/@sc04/kf/Hae2fe615a8de4e938e76ff78839e06aaf.jpg",
+    image: "https://cf.cjdropshipping.com/20200614/1723440734944.jpg", // Stealth Black
     checkoutUrl: "https://buy.stripe.com/3cI8wO57wdSNaFv1Jy3wQ03",
+    badge: "TRAVEL FAVORITE",
   },
 ];
 

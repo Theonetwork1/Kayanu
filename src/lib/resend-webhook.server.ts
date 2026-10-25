@@ -94,12 +94,12 @@ export function describeProblem(e: ResendEvent) {
     e.type === "email.bounced"
       ? [d.bounce?.type, d.bounce?.subType, d.bounce?.message].filter(Boolean).join(" — ")
       : e.type === "email.complained"
-        ? "Le destinataire a marqué l'e-mail comme spam."
+        ? "Recipient marked email as spam."
         : (d.failed?.reason ?? "");
   return {
     to,
     subject: d.subject ?? "",
     emailId: d.email_id ?? "",
-    reason: reason || "Non précisé",
+    reason: reason || "Unspecified",
   };
 }

@@ -15,11 +15,13 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ApiCheckoutRouteImport } from './routes/api.checkout'
 import { Route as ApiCjAdminRouteImport } from './routes/api.cj-admin'
 import { Route as ApiCjWebhookRouteImport } from './routes/api.cj-webhook'
 import { Route as ApiOrderStatusRouteImport } from './routes/api.order-status'
 import { Route as ApiResendWebhookRouteImport } from './routes/api.resend-webhook'
 import { Route as ApiStripeWebhookRouteImport } from './routes/api.stripe-webhook'
+import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +53,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCheckoutRoute = ApiCheckoutRouteImport.update({
+  id: '/api/checkout',
+  path: '/api/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCjAdminRoute = ApiCjAdminRouteImport.update({
   id: '/api/cj-admin',
   path: '/api/cj-admin',
@@ -76,6 +83,11 @@ const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
   path: '/api/stripe-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProductSlugRoute = ProductSlugRouteImport.update({
+  id: '/product/$slug',
+  path: '/product/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -84,11 +96,13 @@ export interface FileRoutesByFullPath {
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
+  '/api/checkout': typeof ApiCheckoutRoute
   '/api/cj-admin': typeof ApiCjAdminRoute
   '/api/cj-webhook': typeof ApiCjWebhookRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/stripe-webhook': typeof ApiStripeWebhookRoute
+  '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -97,11 +111,13 @@ export interface FileRoutesByTo {
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
+  '/api/checkout': typeof ApiCheckoutRoute
   '/api/cj-admin': typeof ApiCjAdminRoute
   '/api/cj-webhook': typeof ApiCjWebhookRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/stripe-webhook': typeof ApiStripeWebhookRoute
+  '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -111,11 +127,13 @@ export interface FileRoutesById {
   '/returns': typeof ReturnsRoute
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
+  '/api/checkout': typeof ApiCheckoutRoute
   '/api/cj-admin': typeof ApiCjAdminRoute
   '/api/cj-webhook': typeof ApiCjWebhookRoute
   '/api/order-status': typeof ApiOrderStatusRoute
   '/api/resend-webhook': typeof ApiResendWebhookRoute
   '/api/stripe-webhook': typeof ApiStripeWebhookRoute
+  '/product/$slug': typeof ProductSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -126,11 +144,13 @@ export interface FileRouteTypes {
     | '/returns'
     | '/shipping'
     | '/terms'
+    | '/api/checkout'
     | '/api/cj-admin'
     | '/api/cj-webhook'
     | '/api/order-status'
     | '/api/resend-webhook'
     | '/api/stripe-webhook'
+    | '/product/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -139,11 +159,13 @@ export interface FileRouteTypes {
     | '/returns'
     | '/shipping'
     | '/terms'
+    | '/api/checkout'
     | '/api/cj-admin'
     | '/api/cj-webhook'
     | '/api/order-status'
     | '/api/resend-webhook'
     | '/api/stripe-webhook'
+    | '/product/$slug'
   id:
     | '__root__'
     | '/'
@@ -152,11 +174,13 @@ export interface FileRouteTypes {
     | '/returns'
     | '/shipping'
     | '/terms'
+    | '/api/checkout'
     | '/api/cj-admin'
     | '/api/cj-webhook'
     | '/api/order-status'
     | '/api/resend-webhook'
     | '/api/stripe-webhook'
+    | '/product/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -166,11 +190,13 @@ export interface RootRouteChildren {
   ReturnsRoute: typeof ReturnsRoute
   ShippingRoute: typeof ShippingRoute
   TermsRoute: typeof TermsRoute
+  ApiCheckoutRoute: typeof ApiCheckoutRoute
   ApiCjAdminRoute: typeof ApiCjAdminRoute
   ApiCjWebhookRoute: typeof ApiCjWebhookRoute
   ApiOrderStatusRoute: typeof ApiOrderStatusRoute
   ApiResendWebhookRoute: typeof ApiResendWebhookRoute
   ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
+  ProductSlugRoute: typeof ProductSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -217,6 +243,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/checkout': {
+      id: '/api/checkout'
+      path: '/api/checkout'
+      fullPath: '/api/checkout'
+      preLoaderRoute: typeof ApiCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/cj-admin': {
       id: '/api/cj-admin'
       path: '/api/cj-admin'
@@ -252,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStripeWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/product/$slug': {
+      id: '/product/$slug'
+      path: '/product/$slug'
+      fullPath: '/product/$slug'
+      preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -262,11 +302,13 @@ const rootRouteChildren: RootRouteChildren = {
   ReturnsRoute: ReturnsRoute,
   ShippingRoute: ShippingRoute,
   TermsRoute: TermsRoute,
+  ApiCheckoutRoute: ApiCheckoutRoute,
   ApiCjAdminRoute: ApiCjAdminRoute,
   ApiCjWebhookRoute: ApiCjWebhookRoute,
   ApiOrderStatusRoute: ApiOrderStatusRoute,
   ApiResendWebhookRoute: ApiResendWebhookRoute,
   ApiStripeWebhookRoute: ApiStripeWebhookRoute,
+  ProductSlugRoute: ProductSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

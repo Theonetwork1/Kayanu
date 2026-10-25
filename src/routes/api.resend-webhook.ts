@@ -55,7 +55,10 @@ export const Route = createFileRoute("/api/resend-webhook")({
         const problem = describeProblem(event);
         console.warn("Resend delivery problem:", event.type, problem.to, problem.reason);
 
-        const owner = process.env["ORDER_NOTIFY_EMAIL"];
+        const owner =
+          process.env["ORDER_NOTIFY_EMAIL"] ||
+          process.env["ADMIN_EMAIL"] ||
+          process.env["OWNER_EMAIL"];
         // Missing configuration can't be fixed by a retry: log and acknowledge. Also
         // never alert about an alert, or a bouncing owner address would loop.
         if (!owner || !process.env["RESEND_API_KEY"] || problem.to.includes(owner)) return ok();

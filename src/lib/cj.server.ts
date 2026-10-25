@@ -5,6 +5,7 @@
 // with the access token, used to verify CJ webhooks), CJ_SANDBOX ("0" to send real orders;
 // anything else, or unset, creates sandbox orders), CJ_AUTO_PAY ("1" pays new orders from
 // the CJ balance; otherwise orders are created unpaid and paid in My CJ).
+import "@/lib/env.server";
 import Stripe from "stripe";
 import { CJ_PRODUCTS, CJ_SET_VIDS, CJ_SHIPPING, type SetColor } from "@/lib/cj-catalog";
 import { getStripeKey } from "@/lib/emails.server";
