@@ -46,7 +46,7 @@ export const Route = createFileRoute("/returns")({
         </p>
         <h2>Damaged or defective items</h2>
         <p>
-          If a zipper or any part of your set fails, email{" "}
+          If your item arrives damaged or stops working, email{" "}
           <a className="text-accent underline" href={`mailto:${CONTACT_EMAIL}`}>
             {CONTACT_EMAIL}
           </a>{" "}

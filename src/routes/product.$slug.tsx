@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { SiteShell } from "@/components/Layout";
 import { PRODUCTS, getProductBySlug, type StoreProduct, type ProductVariant } from "@/lib/products";
@@ -19,9 +19,14 @@ import {
   Sparkles,
 } from "lucide-react";
 
+// Products KAYANU no longer sells.
+const RETIRED_SLUGS = ["kayanu-6-piece-compression-set", "hanging-toiletry-bag-xl"];
+
 export const Route = createFileRoute("/product/$slug")({
   loader: ({ params }) => {
     const product = getProductBySlug(params.slug);
+    // Retired products (old ad links, bookmarks, search results) land on the store, not a 404.
+    if (!product && RETIRED_SLUGS.includes(params.slug)) throw redirect({ to: "/" });
     if (!product) throw notFound();
     return { product };
   },
@@ -67,7 +72,7 @@ function ProductDetailPage() {
   const { product } = Route.useLoaderData();
   const { addItem } = useCart();
 
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(product.variants[0]);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant>(product.variants[0]!);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [overrideImage, setOverrideImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -75,7 +80,7 @@ function ProductDetailPage() {
   useEffect(() => {
     trackViewContent({
       name: product.shortName || product.name,
-      price: product.variants[0].price,
+      price: product.variants[0]!.price,
       id: product.slug,
     });
   }, [product.slug]);
@@ -103,7 +108,7 @@ function ProductDetailPage() {
         name: product.shortName || product.name,
         variantName: selectedVariant.name,
         price: selectedVariant.price,
-        image: selectedVariant.image || currentImage,
+        image: selectedVariant.image || currentImage || "",
         vid: selectedVariant.vid,
         checkoutUrl: product.defaultCheckoutUrl,
       },
@@ -173,7 +178,7 @@ function ProductDetailPage() {
             <div className="mt-8 grid grid-cols-3 gap-3 rounded-2xl border border-border/60 bg-secondary/40 p-4 text-center">
               <div className="flex flex-col items-center">
                 <Truck className="h-5 w-5 text-accent" />
-                <span className="mt-1 text-[11px] font-bold text-foreground">3–8 Day U.S.</span>
+                <span className="mt-1 text-[11px] font-bold text-foreground">3–8 Business Days</span>
                 <span className="text-[10px] text-muted-foreground">Fast Delivery</span>
               </div>
               <div className="flex flex-col items-center border-x border-border/60 px-2">
@@ -184,7 +189,7 @@ function ProductDetailPage() {
               <div className="flex flex-col items-center">
                 <Check className="h-5 w-5 text-accent" />
                 <span className="mt-1 text-[11px] font-bold text-foreground">Quality Check</span>
-                <span className="text-[10px] text-muted-foreground">Ripstop & Zippers</span>
+                <span className="text-[10px] text-muted-foreground">Tested Before Shipping</span>
               </div>
             </div>
           </div>
@@ -192,7 +197,7 @@ function ProductDetailPage() {
           {/* Right Column: Product Info & Buy Action */}
           <div className="flex flex-col">
             <span className="text-xs font-bold uppercase tracking-widest text-accent">
-              Official KAYANU Travel Gear
+              Official KAYANU Store
             </span>
             <h1 className="mt-2 font-display text-3xl font-extrabold text-foreground sm:text-4xl">
               {product.name}
@@ -309,7 +314,7 @@ function ProductDetailPage() {
             {/* Key Features Bullet List */}
             <div className="mt-8 rounded-2xl border border-border/60 bg-card p-5">
               <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
-                Why Travelers Love It
+                Why You'll Love It
               </h3>
               <ul className="mt-3 space-y-2.5">
                 {product.features.map((f, i) => (

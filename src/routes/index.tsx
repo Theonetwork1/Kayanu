@@ -120,16 +120,14 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: DESC },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL },
-      { property: "og:image", content: imageAt(espresso.images[0], 1200) },
+      { property: "og:image", content: imageAt(espresso.images[0]!, 1200) },
       { property: "og:image:alt", content: "KAYANU portable espresso maker brewing a shot with crema" },
-      { property: "product:price:amount", content: blender.price.toFixed(2) },
-      { property: "product:price:currency", content: "USD" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: TITLE },
       { name: "twitter:description", content: DESC },
-      { name: "twitter:image", content: imageAt(espresso.images[0], 1200) },
-      ...productLd.map((p) => ({ "script:ld+json": p })),
-      { "script:ld+json": faqLd },
+      { name: "twitter:image", content: imageAt(espresso.images[0]!, 1200) },
+      ...productLd.map((p) => ({ "script:ld+json": p }) as any),
+      { "script:ld+json": faqLd } as any,
     ],
     links: [canonicalLink("/")],
   }),
@@ -267,7 +265,7 @@ function Hero() {
       <div className="grid gap-4 sm:grid-cols-2">
         <a href="#blender" className="group block overflow-hidden rounded-3xl shadow-[var(--shadow-lift)]">
           <img
-            {...responsiveImage(blender.images[0], "(min-width: 768px) 25vw, 100vw")}
+            {...responsiveImage(blender.images[0]!, "(min-width: 768px) 25vw, 100vw")}
             width={800}
             height={800}
             fetchPriority="high"
@@ -281,7 +279,7 @@ function Hero() {
         </a>
         <a href="#espresso" className="group block overflow-hidden rounded-3xl shadow-[var(--shadow-lift)]">
           <img
-            {...responsiveImage(espresso.images[0], "(min-width: 768px) 25vw, 100vw")}
+            {...responsiveImage(espresso.images[0]!, "(min-width: 768px) 25vw, 100vw")}
             width={1200}
             height={630}
             fetchPriority="high"
@@ -347,7 +345,7 @@ function ProductSection({
 }) {
   const { addItem } = useCart();
   const [qty, setQty] = useState(1);
-  const variant = product.variants[0];
+  const variant = product.variants[0]!;
 
   const handleAddToCart = () => {
     addItem(
@@ -357,7 +355,7 @@ function ProductSection({
         name: product.shortName || product.name,
         variantName: variant.name,
         price: variant.price,
-        image: variant.image || product.images[0],
+        image: variant.image || product.images[0] || "",
         vid: variant.vid,
         checkoutUrl: product.defaultCheckoutUrl,
       },
@@ -369,7 +367,7 @@ function ProductSection({
     <section id={id} className="mx-auto grid max-w-6xl scroll-mt-28 gap-12 px-5 py-20 md:grid-cols-2">
       <div className="reveal">
         <img
-          {...responsiveImage(product.images[0], "(min-width: 1152px) 540px, (min-width: 768px) 50vw, 100vw")}
+          {...responsiveImage(product.images[0]!, "(min-width: 1152px) 540px, (min-width: 768px) 50vw, 100vw")}
           width={1200}
           height={1200}
           loading="lazy"
@@ -456,7 +454,7 @@ function ProductSection({
         <ul className="mt-6 space-y-2 text-sm">
           {[
             "FREE shipping on orders $50+ (otherwise $4.95)",
-            "Processed in 1–2 business days, delivered in 3–8 days",
+            "Processed in 1–2 business days, delivered in 3–8 business days",
             "30-day happiness guarantee — full refund",
           ].map((t) => (
             <li key={t} className="flex gap-2">

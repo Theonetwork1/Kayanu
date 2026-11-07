@@ -28,7 +28,7 @@ function Header() {
   return (
     <>
       <div className="bg-primary px-4 py-2 text-center text-[11px] font-semibold tracking-widest text-primary-foreground sm:text-xs">
-        FAST U.S. SHIPPING — DELIVERED IN 3–8 DAYS • 30-DAY HAPPINESS GUARANTEE
+        FAST U.S. SHIPPING — DELIVERED IN 3–8 BUSINESS DAYS • 30-DAY HAPPINESS GUARANTEE
       </div>
       <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-2">

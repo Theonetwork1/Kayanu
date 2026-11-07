@@ -286,7 +286,7 @@ export function CartDrawer() {
                 </div>
                 <div className="flex items-center gap-1">
                   <Truck className="h-3.5 w-3.5 text-accent" />
-                  <span>3–8 Day U.S. Delivery</span>
+                  <span>3–8 Business Day U.S. Delivery</span>
                 </div>
               </div>
             </div>

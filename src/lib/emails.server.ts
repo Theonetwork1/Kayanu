@@ -139,7 +139,7 @@ function layout(opts: {
     opts.footer ??
     [
       `<span style="font-family:${FONT_DISPLAY};font-size:13px;letter-spacing:3px;font-weight:800;color:${C.teal};">KAYANU</span>`,
-      "Premium travel essentials. Pack more, stress less.",
+      "Portable drinks, wherever you are.",
       `Questions or a return? Email ${link(SUPPORT_EMAIL, `mailto:${SUPPORT_EMAIL}`)} within 30 days of delivery.`,
       [
         link("Shipping", `${SITE}/shipping`),
@@ -304,7 +304,7 @@ export function orderStatus(o: Order, status: ShipmentStatus, t: Tracking): Mail
       : [
           h1("Your order was delivered"),
           p(
-            `Order <strong>${esc(o.number)}</strong> has been delivered${first ? `, ${esc(first)}` : ""}. We hope you love your KAYANU cubes!`,
+            `Order <strong>${esc(o.number)}</strong> has been delivered${first ? `, ${esc(first)}` : ""}. We hope you love your KAYANU order!`,
           ),
           p(
             `If anything isn't right, email <a href="mailto:${SUPPORT_EMAIL}" style="color:${C.teal};font-weight:bold;">${SUPPORT_EMAIL}</a> within 30 days of delivery to start a return &mdash; our happiness guarantee has you covered.`,
@@ -333,7 +333,7 @@ export function abandonedCart(o: Order): Mail | null {
   if (!o.email || !o.recoveryUrl || !o.promoConsent) return null;
   const body = [
     h1("You left something behind"),
-    p("Your KAYANU packing cubes are still waiting. Finish your order in a few clicks:"),
+    p("Your KAYANU order is still waiting. Finish your order in a few clicks:"),
     itemsTable(o, false),
     button("Complete my order", o.recoveryUrl),
     small("Orders over $50 ship free. 30-day happiness guarantee."),
