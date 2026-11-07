@@ -4,51 +4,33 @@ import {
   Check,
   ShieldCheck,
   Truck,
-  Package,
-  X,
-  Layers,
-  Wind,
-  Shirt,
+  Coffee,
+  CupSoda,
+  Zap,
   ChevronDown,
-  ShoppingBag,
+  Minus,
+  Plus,
+  X,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { trackPurchase, getLastCheckoutTotal } from "@/lib/meta-pixel";
 import { SiteShell, useReveal } from "@/components/Layout";
 import {
-  ADDONS,
-  COLORS,
   SITE_URL,
-  VARIANTS,
   WELCOME_CODE,
   canonicalLink,
   formatPrice,
-  getVariant,
-  type ColorId,
-  type VariantId,
 } from "@/config";
+import { PRODUCTS, type StoreProduct } from "@/lib/products";
 import type { LucideIcon } from "lucide-react";
 import { imageAt, responsiveImage } from "@/lib/images";
-export const COLOR_IMAGES: Record<ColorId, string> = {
-  sand: "https://cf.cjdropshipping.com/quick/product/950a6309-811c-4153-9968-c00074f91019.jpg", // Beige / Sand (CJYD196103714NM)
-  charcoal: "https://cf.cjdropshipping.com/quick/product/9118dbac-738e-4f46-a0b7-48020296dbd8.jpg", // Black / Charcoal (CJYD196103707GT)
-  "ocean-teal": "https://cf.cjdropshipping.com/quick/product/7bdc3f77-c082-4293-847c-ebb2fab5cb1f.jpg", // Navy / Ocean Teal (CJYD196103712LO)
-  "cloud-gray": "https://cf.cjdropshipping.com/quick/product/2a3984ad-5b1b-4db3-989b-5f03dfaf42cd.jpg", // Gray (CJYD196103709IR)
-  "crimson-red": "https://cf.cjdropshipping.com/quick/product/fab60df4-850e-440c-a734-1e8439211055.jpg", // Red (CJYD196103708HS)
-  "sage-green": "https://cf.cjdropshipping.com/quick/product/34348907-750a-41e6-bdec-9444e2e93445.jpg", // Green (CJYD196103710JQ)
-  "sky-blue": "https://cf.cjdropshipping.com/quick/product/f187d3df-9b61-4730-8d4b-d41734e961ac.jpg", // Sky Blue (CJYD196103711KP)
-  "blossom-pink": "https://cf.cjdropshipping.com/quick/product/0fdadc7d-1508-4b9c-bae0-3b9f45d26454.jpg", // Pink (CJYD196103713MN)
-};
 
-// High-definition product visuals
-const heroImg = "/images/products/kayanu-6pc-suitcase-packed.jpg"; // Real packed suitcase lifestyle
-const compressImg = "https://cf.cjdropshipping.com/17159040/2405170951120324600.jpg"; // Step 1 -> Step 2 -> Step 3 60% compression demo
-const insideImg = "/images/products/kayanu-6pc-lineup.png"; // All 6 pieces standing together with garment classification icons
+const blender = PRODUCTS.find((p) => p.slug === "kayanu-portable-blender")!;
+const espresso = PRODUCTS.find((p) => p.slug === "kayanu-portable-espresso-maker")!;
 
-const TITLE = "Compression Packing Cubes — 6-Piece Travel Set | KAYANU";
+const TITLE = "Portable Blender & Espresso Maker | KAYANU — Take It Anywhere";
 const DESC =
-  "Pack twice as much: 5 graduated compression cubes plus a dedicated drawstring shoe/laundry bag (6 pieces total). Fits carry-on and checked luggage. Free U.S. shipping on orders $50+, 30-day returns.";
-const PRODUCT_NAME = "KAYANU 6-Piece Compression Packing Cube Set";
+  "KAYANU portable USB-C blender and 20-bar self-heating espresso maker. Smoothies and real espresso anywhere — gym, office, car or trail. Free U.S. shipping on orders $50+, 30-day returns.";
 
 const FAQ: [string, string][] = [
   [
@@ -56,20 +38,24 @@ const FAQ: [string, string][] = [
     "Orders are processed in 1–2 business days, then delivered in 3–8 business days anywhere in the U.S. You'll receive tracking by email as soon as your order ships.",
   ],
   [
-    "What's included in the set?",
-    "Each set includes 6 pieces: 1 Extra Large cube (for jackets and sweaters), 1 Large cube (for pants and dresses), 1 Medium cube (for shirts), 1 Small cube (for underwear), 1 Slim accessories pouch (for socks and cords), and 1 versatile drawstring shoe/laundry bag.",
+    "How many smoothies can the blender make per charge?",
+    "It varies with the fruit and the load. Charge it fully before first use, use soft fruit with enough liquid, and don't overfill — overfilling strains the motor.",
   ],
   [
-    "Will the set fit a carry-on?",
-    "Yes. The graduated sizes fit carry-on and checked luggage — use the smaller cubes for a carry-on and the full set for checked bags.",
+    "Can the blender crush ice?",
+    "It's built for soft fruit, shakes and smoothies. It can handle a few small ice cubes with enough liquid, but heavy frozen fruit and big ice cubes are not what it's made for.",
   ],
   [
-    "How does compression work?",
-    "Pack the cube and close the main zipper. Then close the second compression zipper around the edge — it pulls the cube flatter and pushes out the air.",
+    "How many espressos per charge?",
+    "About 4 shots on cold water. Use hot water and you'll get many more — the heater is what uses the battery. One shot is 50 ml.",
   ],
   [
-    "What if a zipper breaks?",
-    "Every zipper is quality-checked before shipping. If one fails, contact us and we'll replace it or refund you.",
+    "Does the espresso maker work with Vertuo capsules?",
+    "No — ground coffee and Nespresso Original capsules only. Vertuo capsules are not supported.",
+  ],
+  [
+    "What if something stops working?",
+    "Every unit is covered by the 30-day happiness guarantee. If it fails, contact us and we'll replace it or refund you.",
   ],
   [
     "What is your return policy?",
@@ -78,7 +64,7 @@ const FAQ: [string, string][] = [
 ];
 
 // Structured data for Google rich results (price, availability, shipping and returns;
-// FAQ). Mirrors the visible page and config.ts: no ratings, nothing invented.
+// FAQ). Mirrors the visible page and products.ts: no ratings, nothing invented.
 const shippingDetails = (price: number) => ({
   "@type": "OfferShippingDetails",
   shippingRate: { "@type": "MonetaryAmount", value: price >= 50 ? 0 : 4.95, currency: "USD" },
@@ -96,30 +82,25 @@ const returnPolicy = {
   merchantReturnDays: 30,
   returnMethod: "https://schema.org/ReturnByMail",
 };
-const productLd = {
+const productLd = [blender, espresso].map((p) => ({
   "@context": "https://schema.org",
   "@type": "Product",
-  name: PRODUCT_NAME,
-  description: DESC,
+  name: p.name,
+  description: p.description,
   brand: { "@type": "Brand", name: "KAYANU" },
-  image: [
-    heroImg.startsWith("http") ? heroImg : `${SITE_URL}${heroImg}`,
-    insideImg.startsWith("http") ? insideImg : `${SITE_URL}${insideImg}`,
-    compressImg.startsWith("http") ? compressImg : `${SITE_URL}${compressImg}`,
-  ],
-  color: COLORS.map((c) => c.label).join(", "),
-  offers: VARIANTS.map((v) => ({
+  image: p.images.map((img) => (img.startsWith("http") ? img : `${SITE_URL}${img}`)),
+  offers: {
     "@type": "Offer",
-    name: v.label,
-    price: v.price.toFixed(2),
+    name: p.shortName,
+    price: p.price.toFixed(2),
     priceCurrency: "USD",
     availability: "https://schema.org/InStock",
     itemCondition: "https://schema.org/NewCondition",
-    url: `${SITE_URL}/#buy`,
-    shippingDetails: shippingDetails(v.price),
+    url: `${SITE_URL}/product/${p.slug}`,
+    shippingDetails: shippingDetails(p.price),
     hasMerchantReturnPolicy: returnPolicy,
-  })),
-};
+  },
+}));
 const faqLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -137,17 +118,17 @@ export const Route = createFileRoute("/")({
       { name: "description", content: DESC },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESC },
-      { property: "og:type", content: "product" },
+      { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL },
-      { property: "og:image", content: imageAt(heroImg, 1200) },
-      { property: "og:image:alt", content: "KAYANU compression packing cubes in an open suitcase" },
-      { property: "product:price:amount", content: getVariant("1-set").price.toFixed(2) },
+      { property: "og:image", content: imageAt(espresso.images[0], 1200) },
+      { property: "og:image:alt", content: "KAYANU portable espresso maker brewing a shot with crema" },
+      { property: "product:price:amount", content: blender.price.toFixed(2) },
       { property: "product:price:currency", content: "USD" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: TITLE },
       { name: "twitter:description", content: DESC },
-      { name: "twitter:image", content: imageAt(heroImg, 1200) },
-      { "script:ld+json": productLd },
+      { name: "twitter:image", content: imageAt(espresso.images[0], 1200) },
+      ...productLd.map((p) => ({ "script:ld+json": p })),
       { "script:ld+json": faqLd },
     ],
     links: [canonicalLink("/")],
@@ -220,10 +201,16 @@ function Home() {
       )}
       <Hero />
       <Problem />
-      <HowItWorks />
-      <Inside />
-      <Buy />
-      <CompleteKit />
+      <ProductSection product={blender} id="blender" howItWorks={[
+        ["Add soft fruit + liquid", "Fruit, milk or water — fill to the line, don't overfill."],
+        ["Press the button", "One press blends it smooth in about 30 seconds."],
+        ["Drink anywhere", "Screw the lid on and go — gym, office, car or trail."],
+      ]} />
+      <ProductSection product={espresso} id="espresso" howItWorks={[
+        ["Add water + coffee", "Cold water in the tank, ground coffee or an Original capsule."],
+        ["Press the button", "It heats the water and brews under 20-bar pressure."],
+        ["Espresso with crema", "A real shot in about 5 minutes — no café, no outlet."],
+      ]} />
       <Comparison />
       <Guarantee />
       <Faq />
@@ -234,36 +221,35 @@ function Home() {
 }
 
 function Hero() {
-  const price = getVariant("1-set").price;
   return (
     <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-12 md:grid-cols-2 md:py-20">
       {/* No .reveal here: the first screen must paint immediately (LCP, first impression). */}
       <div>
         <p className="inline-block rounded-full bg-accent/15 px-3 py-1 text-xs font-bold tracking-wider text-accent">
-          6-PIECE COMPRESSION PACKING CUBES
+          PORTABLE BLENDER + ESPRESSO MAKER
         </p>
         <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] sm:text-5xl lg:text-6xl">
-          Pack twice as much. Stress half as much.
+          Your smoothie. Your espresso. Anywhere.
         </h1>
         <p className="mt-5 max-w-lg text-lg text-muted-foreground">
-          KAYANU compression cubes squeeze the air out of your clothes with a second zipper, so
-          everything fits — and stays organized — in any suitcase.
+          Two pocket-size essentials that replace the $5 café stop: a USB-C blender for
+          smoothies and shakes, and a 20-bar self-heating espresso maker with real crema.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-5">
-          <a id="hero-cta" href="#buy" className="btn-primary w-full sm:w-auto">
-            Get the 6-Piece Set — {formatPrice(price)}
+          <a id="hero-cta" href="#blender" className="btn-primary w-full sm:w-auto">
+            Shop the Blender — {formatPrice(blender.price)}
           </a>
           <a
-            href="#how-it-works"
+            href="#espresso"
             className="inline-block py-3 font-semibold underline underline-offset-4"
           >
-            See how it works
+            See the Espresso Maker — {formatPrice(espresso.price)}
           </a>
         </div>
         <ul className="mt-8 flex flex-wrap gap-2 text-sm">
           {(
             [
-              [Check, "Quality-checked zippers"],
+              [Zap, "USB-C rechargeable"],
               [Truck, "Fast U.S. shipping"],
               [ShieldCheck, "30-day guarantee"],
             ] as [LucideIcon, string][]
@@ -278,16 +264,35 @@ function Hero() {
           ))}
         </ul>
       </div>
-      <div>
-        <img
-          {...responsiveImage(heroImg, "(min-width: 1152px) 556px, (min-width: 768px) 50vw, 100vw")}
-          width={1200}
-          height={900}
-          fetchPriority="high"
-          decoding="async"
-          alt="Open suitcase packed with KAYANU compression packing cubes"
-          className="aspect-[4/3] w-full rounded-3xl object-cover shadow-[var(--shadow-lift)]"
-        />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <a href="#blender" className="group block overflow-hidden rounded-3xl shadow-[var(--shadow-lift)]">
+          <img
+            {...responsiveImage(blender.images[0], "(min-width: 768px) 25vw, 100vw")}
+            width={800}
+            height={800}
+            fetchPriority="high"
+            decoding="async"
+            alt="KAYANU portable blender with fresh smoothie"
+            className="aspect-square w-full object-cover transition group-hover:scale-105"
+          />
+          <p className="bg-card px-4 py-3 text-sm font-bold">
+            Portable Blender — {formatPrice(blender.price)}
+          </p>
+        </a>
+        <a href="#espresso" className="group block overflow-hidden rounded-3xl shadow-[var(--shadow-lift)]">
+          <img
+            {...responsiveImage(espresso.images[0], "(min-width: 768px) 25vw, 100vw")}
+            width={1200}
+            height={630}
+            fetchPriority="high"
+            decoding="async"
+            alt="KAYANU portable espresso maker brewing a shot with crema"
+            className="aspect-square w-full object-cover transition group-hover:scale-105"
+          />
+          <p className="bg-card px-4 py-3 text-sm font-bold">
+            Portable Espresso Maker — {formatPrice(espresso.price)}
+          </p>
+        </a>
       </div>
     </section>
   );
@@ -296,26 +301,26 @@ function Hero() {
 function Problem() {
   const items = [
     [
-      Layers,
-      "Overpacking chaos",
-      "Everything piled in one heap. KAYANU sorts your clothes by category so you find anything in seconds.",
+      Coffee,
+      "Café prices add up",
+      "$5–$7 a day for coffee and smoothies is $150+ a month. Make it yourself, anywhere, for under a dollar a drink.",
     ],
     [
-      Wind,
-      "Wasted space",
-      "Air takes up room. The compression zipper squeezes each cube flatter so more fits in the same bag.",
+      CupSoda,
+      "No healthy option on the go",
+      "Between meetings, workouts and road trips, the only options are vending machines and drive-thrus.",
     ],
     [
-      Shirt,
-      "Wrinkled, messy clothes",
-      "Loose clothes shift and crumple. Snug cubes hold folds in place from home to hotel.",
+      Zap,
+      "Big gadgets stay home",
+      "Full-size blenders and espresso machines never leave the kitchen. These two fit in a bag and charge over USB-C.",
     ],
   ] as const;
   return (
     <section className="bg-secondary py-20">
       <div className="mx-auto max-w-6xl px-5">
         <h2 className="reveal mx-auto max-w-2xl text-center text-3xl font-extrabold sm:text-4xl">
-          Still sitting on your suitcase to zip it shut?
+          Why carry the café with you?
         </h2>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {items.map(([I, t, d]) => (
@@ -331,221 +336,113 @@ function Problem() {
   );
 }
 
-function HowItWorks() {
-  const steps = [
-    [
-      "Pack each cube by category",
-      "Tops in one, bottoms in another, underwear and socks in the small ones.",
-    ],
-    [
-      "Zip the compression zipper",
-      "Close the main zipper, then the second one to squeeze out the air.",
-    ],
-    ["Drop them in and go", "Slide the slim cubes into your suitcase. Done in minutes."],
-  ];
-  return (
-    <section
-      id="how-it-works"
-      className="mx-auto grid max-w-6xl scroll-mt-28 items-center gap-12 px-5 py-20 md:grid-cols-2"
-    >
-      <img
-        {...responsiveImage(
-          compressImg,
-          "(min-width: 1152px) 540px, (min-width: 768px) 50vw, 100vw",
-        )}
-        width={1200}
-        height={960}
-        loading="lazy"
-        decoding="async"
-        alt="Zipping the compression zipper on a packing cube"
-        className="reveal rounded-3xl object-cover shadow-[var(--shadow-soft)]"
-      />
-      <div className="reveal">
-        <Eyebrow>How it works</Eyebrow>
-        <h2 className="text-3xl font-extrabold sm:text-4xl">
-          Three steps to a lighter-feeling suitcase
-        </h2>
-        <ol className="mt-8 space-y-6">
-          {steps.map(([t, d], i) => (
-            <li key={t} className="flex gap-5">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary font-display font-bold text-primary-foreground">
-                {i + 1}
-              </span>
-              <div>
-                <h3 className="font-bold">{t}</h3>
-                <p className="text-muted-foreground">{d}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
-  );
-}
-
-function Inside() {
-  const pieces = [
-    ["1 × Extra Large cube", "Coats, jackets, heavy sweaters (15.7″ × 15.7″ × 3.5″)"],
-    ["1 × Large cube", "Jeans, trousers, dresses (11.8″ × 15.7″ × 3.5″)"],
-    ["1 × Medium cube", "Shirts, tops, activewear (9.8″ × 13.7″ × 3.5″)"],
-    ["1 × Small cube", "Underwear, bras, swimwear (7.8″ × 11.8″ × 3.5″)"],
-    ["1 × Slim accessories pouch", "Socks, charging cables, adapters (13.7″ × 3.9″ × 3.5″)"],
-    ["1 × Drawstring bag", "Keeps dirty laundry or shoes separated (18.5″ × 13.7″)"],
-  ];
-  return (
-    <section id="inside" className="scroll-mt-28 bg-secondary py-20">
-      <div className="mx-auto max-w-6xl px-5">
-        <div className="reveal text-center">
-          <Eyebrow>What's inside the set</Eyebrow>
-          <h2 className="text-3xl font-extrabold sm:text-4xl">
-            6 pieces: 5 compression cubes + 1 drawstring shoe/laundry bag
-          </h2>
-        </div>
-        <div className="mt-12 grid items-center gap-10 md:grid-cols-2">
-          <img
-            {...responsiveImage(
-              insideImg,
-              "(min-width: 1152px) 540px, (min-width: 768px) 50vw, 100vw",
-            )}
-            width={1200}
-            height={1200}
-            loading="lazy"
-            decoding="async"
-            alt="All 6 pieces in the KAYANU compression packing cube set with garment icons"
-            className="reveal rounded-3xl shadow-[var(--shadow-soft)] bg-card"
-          />
-          <div className="grid gap-4 sm:grid-cols-2">
-            {pieces.map(([t, d]) => (
-              <div key={t} className="reveal card-soft p-5">
-                <Package className="h-6 w-6 text-accent" />
-                <h3 className="mt-3 font-bold">{t}</h3>
-                <p className="text-sm text-muted-foreground">{d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Buy() {
+function ProductSection({
+  product,
+  id,
+  howItWorks,
+}: {
+  product: StoreProduct;
+  id: string;
+  howItWorks: [string, string][];
+}) {
   const { addItem } = useCart();
-  const [color, setColor] = useState<ColorId>("charcoal");
-  const [variant, setVariant] = useState<VariantId>("2-sets");
-  const v = getVariant(variant);
-  const colorLabel = COLORS.find((c) => c.id === color)!.label;
-  const activeImg = COLOR_IMAGES[color] || flatlayImg;
+  const [qty, setQty] = useState(1);
+  const variant = product.variants[0];
 
   const handleAddToCart = () => {
-    addItem({
-      id: `set-${variant}-${color}`,
-      productId: "kayanu-6-piece-compression-set",
-      name: `KAYANU 6-Piece Set (${v.label})`,
-      variantName: colorLabel,
-      price: v.price,
-      image: activeImg,
-      checkoutUrl: v.checkoutUrl,
-    });
+    addItem(
+      {
+        id: `${product.slug}-${variant.id}`,
+        productId: product.slug,
+        name: product.shortName || product.name,
+        variantName: variant.name,
+        price: variant.price,
+        image: variant.image || product.images[0],
+        vid: variant.vid,
+        checkoutUrl: product.defaultCheckoutUrl,
+      },
+      qty,
+    );
   };
 
   return (
-    <section
-      id="buy"
-      className="mx-auto grid max-w-6xl scroll-mt-28 gap-12 px-5 py-20 md:grid-cols-2"
-    >
+    <section id={id} className="mx-auto grid max-w-6xl scroll-mt-28 gap-12 px-5 py-20 md:grid-cols-2">
       <div className="reveal">
         <img
-          key={color}
-          {...responsiveImage(
-            activeImg,
-            "(min-width: 1152px) 540px, (min-width: 768px) 50vw, 100vw",
-          )}
+          {...responsiveImage(product.images[0], "(min-width: 1152px) 540px, (min-width: 768px) 50vw, 100vw")}
           width={1200}
           height={1200}
           loading="lazy"
           decoding="async"
-          alt={`KAYANU 6-piece compression packing cube set in ${colorLabel}`}
-          className="sticky top-28 rounded-3xl shadow-[var(--shadow-lift)] transition-all duration-300"
+          alt={product.name}
+          className="sticky top-28 rounded-3xl shadow-[var(--shadow-lift)]"
         />
       </div>
       <div className="reveal">
         <Eyebrow>Shop</Eyebrow>
-        <h2 className="text-3xl font-extrabold sm:text-4xl">
-          KAYANU 6-Piece Compression Packing Cube Set
-        </h2>
+        <h2 className="text-3xl font-extrabold sm:text-4xl">{product.name}</h2>
+        <p className="mt-3 text-lg text-muted-foreground">{product.tagline}</p>
         <p className="mt-4 flex items-baseline gap-3">
-          <span className="font-display text-3xl font-bold">{formatPrice(v.price)}</span>
+          <span className="font-display text-3xl font-bold">{formatPrice(product.price)}</span>
           <span className="text-lg text-muted-foreground line-through">
-            {formatPrice(v.compareAt)}
+            {formatPrice(product.compareAt)}
           </span>
           <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-bold text-accent-foreground">
-            SAVE {formatPrice(v.compareAt - v.price)}
+            SAVE {formatPrice(product.compareAt - product.price)}
           </span>
         </p>
 
-        <p className="mt-8 text-sm font-semibold">
-          Color: <span className="font-normal text-muted-foreground">{colorLabel}</span>
-        </p>
-        <div className="mt-3 flex flex-wrap gap-3">
-          {COLORS.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setColor(c.id)}
-              aria-label={c.label}
-              aria-pressed={color === c.id}
-              className={`h-11 w-11 rounded-full border-2 ring-offset-2 ring-offset-background transition ${color === c.id ? "ring-2 ring-primary" : ""}`}
-              style={{ background: c.swatch }}
-            />
+        <ul className="mt-8 space-y-3">
+          {product.features.map((f) => (
+            <li key={f} className="flex gap-2 text-sm">
+              <Check className="h-5 w-5 shrink-0 text-accent" />
+              {f}
+            </li>
           ))}
+        </ul>
+
+        <div className="mt-8">
+          <h3 className="font-bold">How it works</h3>
+          <ol className="mt-4 space-y-4">
+            {howItWorks.map(([t, d], i) => (
+              <li key={t} className="flex gap-4">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary font-display font-bold text-primary-foreground">
+                  {i + 1}
+                </span>
+                <div>
+                  <h4 className="font-bold text-sm">{t}</h4>
+                  <p className="text-sm text-muted-foreground">{d}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
 
-        <p className="mt-8 text-sm font-semibold">Bundle</p>
-        <div className="mt-3 grid gap-3">
-          {VARIANTS.map((o) => (
-            <button
-              key={o.id}
-              onClick={() => setVariant(o.id)}
-              aria-pressed={variant === o.id}
-              className={`relative flex items-center justify-between rounded-2xl border-2 bg-card p-4 text-left transition ${variant === o.id ? "border-primary shadow-[var(--shadow-soft)]" : "border-border"}`}
-            >
-              {o.badge && (
-                <span className="absolute -top-2.5 right-4 rounded-full bg-accent px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-accent-foreground">
-                  {o.badge}
-                </span>
-              )}
-              <span>
-                <span className="block font-bold">{o.label}</span>
-                <span className="text-sm text-muted-foreground">{o.includes}</span>
-              </span>
-              <span className="text-right">
-                <span className="block font-bold">{formatPrice(o.price)}</span>
-                <span className="text-xs text-accent">
-                  Save {formatPrice(o.compareAt - o.price)}
-                </span>
-              </span>
+        <div className="mt-8 flex gap-3">
+          <div className="flex items-center rounded-full border bg-card">
+            <button aria-label="Decrease quantity" className="p-3" onClick={() => setQty(Math.max(1, qty - 1))}>
+              <Minus className="h-4 w-4" />
             </button>
-          ))}
-        </div>
-
-        {/* Buttons: Add to Cart & Buy Now */}
-        <div className="mt-6 flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={handleAddToCart}
-            className="flex-1 flex items-center justify-center gap-2 rounded-full border-2 border-primary bg-card py-3.5 text-sm font-bold text-primary hover:bg-primary/5 transition shadow-xs"
-          >
-            <ShoppingBag className="h-4 w-4" />
-            Add to Cart — {formatPrice(v.price)}
+            <span className="w-8 text-center font-semibold">{qty}</span>
+            <button aria-label="Increase quantity" className="p-3" onClick={() => setQty(qty + 1)}>
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
+          <button className="btn-primary flex-1" onClick={handleAddToCart}>
+            Add to Cart — {formatPrice(product.price * qty)}
           </button>
-          <a href={v.checkoutUrl} className="btn-primary flex-1">
-            Buy now
-          </a>
         </div>
+        <button
+          onClick={handleAddToCart}
+          className="mt-3 w-full rounded-full border-2 border-primary bg-card py-3.5 text-sm font-bold text-primary hover:bg-primary/5 transition"
+        >
+          Buy now — {formatPrice(product.price * qty)}
+        </button>
 
         <div className="mt-3 text-center">
           <Link
             to="/product/$slug"
-            params={{ slug: "kayanu-6-piece-compression-set" }}
+            params={{ slug: product.slug }}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary underline underline-offset-4 hover:opacity-80"
           >
             View full gallery & detailed specifications →
@@ -561,7 +458,6 @@ function Buy() {
             "FREE shipping on orders $50+ (otherwise $4.95)",
             "Processed in 1–2 business days, delivered in 3–8 days",
             "30-day happiness guarantee — full refund",
-            "Quality-checked zippers before shipping",
           ].map((t) => (
             <li key={t} className="flex gap-2">
               <Check className="h-5 w-5 shrink-0 text-accent" />
@@ -571,247 +467,27 @@ function Buy() {
         </ul>
 
         <div className="mt-8">
-          <Accordion q="Materials">
-            Lightweight, water-resistant ripstop nylon with smooth double zippers and a carry handle
-            on each cube.
+          <Accordion q="Specifications">
+            <ul className="space-y-1.5">
+              {product.specs.map((s) => (
+                <li key={s.label}>
+                  <strong className="text-foreground">{s.label}:</strong> {s.value}
+                </li>
+              ))}
+            </ul>
           </Accordion>
-          <Accordion q="Care">
-            Hand wash or machine wash cold on a gentle cycle in a laundry bag. Air dry. Do not iron
-            or bleach.
+          <Accordion q="What's included">
+            <ul className="list-disc pl-5 space-y-1">
+              {product.includes.map((i) => (
+                <li key={i}>{i}</li>
+              ))}
+            </ul>
           </Accordion>
-          <Accordion q="Dimensions">
-            Four graduated sizes designed to fit carry-on and checked luggage. Mix and match to fill
-            any suitcase.
+          <Accordion q="Shipping & returns">
+            Orders are processed in 1–2 business days, then delivered in 3–8 business days
+            anywhere in the U.S. You have 30 days from delivery to return your order for a full
+            refund.
           </Accordion>
-        </div>
-
-        {/* Highlighted Cross-Sell for the Hanging Toiletry Bag */}
-        <div className="mt-8 rounded-2xl border border-primary/25 bg-primary/5 p-4 flex items-center justify-between gap-4 shadow-sm">
-          <div className="flex items-center gap-3.5">
-            <img
-              src="https://cf.cjdropshipping.com/20200614/63161490373112.jpg"
-              alt="Hanging Toiletry Bag — XL"
-              className="h-14 w-14 rounded-xl object-cover border border-border"
-            />
-            <div>
-              <span className="block font-bold text-sm text-foreground">Hanging Toiletry Bag — XL</span>
-              <span className="text-xs text-muted-foreground">Waterproof hanging travel organizer • $24.99</span>
-            </div>
-          </div>
-          <a
-            href="#toiletry"
-            className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 whitespace-nowrap shadow-sm"
-          >
-            View bag →
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CompleteKit() {
-  const { addItem } = useCart();
-  const toiletryVariants = [
-    {
-      id: "black",
-      name: "Stealth Black",
-      sku: "CJBHNSNS16022-Black",
-      vid: "096FDDA3-178F-4B3D-AD72-23C77A241455",
-      image: "https://cf.cjdropshipping.com/20200614/1723440734944.jpg",
-      swatch: "oklch(0.28 0.01 250)",
-    },
-    {
-      id: "grey",
-      name: "Classic Grey",
-      sku: "CJBHNSNS16022-Grey",
-      vid: "42FD7A64-21BB-4269-BAA5-6B94C277D924",
-      image: "https://cf.cjdropshipping.com/20200614/63161490373112.jpg",
-      swatch: "oklch(0.62 0.02 240)",
-    },
-    {
-      id: "navy",
-      name: "Deep Navy",
-      sku: "CJBHNSNS16022-Navy",
-      vid: "70C3CEC3-7AA3-4262-A15B-C12B81B0CAD8",
-      image: "https://cf.cjdropshipping.com/20200614/1651542993816.jpg",
-      swatch: "oklch(0.42 0.07 220)",
-    },
-    {
-      id: "wine-red",
-      name: "Wine Red",
-      sku: "CJBHNSNS16022-Wine Red",
-      vid: "6C20B098-7B81-449F-8C73-CB822D2893C2",
-      image: "https://cf.cjdropshipping.com/20200614/3222559376202.jpg",
-      swatch: "oklch(0.45 0.12 25)",
-    },
-    {
-      id: "purple",
-      name: "Plum Purple",
-      sku: "CJBHNSNS16022-Purple",
-      vid: "58BB1AE1-113A-42B7-86BE-72D39839C582",
-      image: "https://cf.cjdropshipping.com/20200614/1496132150298.jpg",
-      swatch: "oklch(0.48 0.12 310)",
-    },
-    {
-      id: "sky-blue",
-      name: "Sky Blue",
-      sku: "CJBHNSNS16022-Sky Blue",
-      vid: "F567DE21-CBAD-4E45-B384-15FD325BE27C",
-      image: "https://cf.cjdropshipping.com/20200614/66532742498.jpg",
-      swatch: "oklch(0.70 0.10 220)",
-    },
-  ];
-
-  const [selectedToiletryColor, setSelectedToiletryColor] = useState(toiletryVariants[0]);
-  const [activeToiletryView, setActiveToiletryView] = useState<"hanging" | "folded">("hanging");
-  const hangingOpenImg = "https://cf.cjdropshipping.com/20200614/2445321016976.jpg";
-
-  const handleAddToiletry = () => {
-    addItem({
-      id: `hanging-toiletry-bag-xl-${selectedToiletryColor.id}`,
-      productId: "hanging-toiletry-bag-xl",
-      name: "KAYANU Hanging Toiletry Bag — XL",
-      variantName: selectedToiletryColor.name,
-      price: 24.99,
-      image: selectedToiletryColor.image,
-      vid: selectedToiletryColor.vid,
-      checkoutUrl: "https://buy.stripe.com/5kQfZg2Zo01X28Z3RG3wQ0b",
-    });
-  };
-
-  const currentToiletryImg = activeToiletryView === "hanging" ? hangingOpenImg : selectedToiletryColor.image;
-
-  return (
-    <section id="toiletry" className="scroll-mt-28 py-20 bg-secondary/50">
-      <div className="mx-auto max-w-5xl px-5">
-        <div className="reveal text-center">
-          <Eyebrow>Travel Companion Gear</Eyebrow>
-          <h2 className="text-3xl font-extrabold sm:text-4xl">KAYANU Hanging Toiletry Bag — XL</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            The ideal travel partner for your packing cubes. Unfolds and hangs anywhere to keep full-size bottles, grooming gear, and cosmetics leak-free and off cramped hotel countertops.
-          </p>
-        </div>
-
-        <div className="mt-12 overflow-hidden rounded-3xl bg-card border border-border shadow-[var(--shadow-soft)] grid md:grid-cols-2 items-center">
-          {/* Image side with in-use open & folded switcher */}
-          <div className="relative aspect-square w-full bg-secondary/40 p-4 flex flex-col justify-between">
-            <div className="relative h-full w-full overflow-hidden rounded-2xl">
-              <img
-                src={currentToiletryImg}
-                alt={
-                  activeToiletryView === "hanging"
-                    ? "KAYANU Hanging Toiletry Bag XL hanging open with toiletries"
-                    : `KAYANU Hanging Toiletry Bag XL in ${selectedToiletryColor.name}`
-                }
-                className="h-full w-full object-cover transition-all duration-300"
-              />
-              <span className="absolute top-3 left-3 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground tracking-wider shadow-sm">
-                TRAVEL FAVORITE
-              </span>
-            </div>
-
-            {/* Quick open vs folded preview buttons */}
-            <div className="mt-3 flex gap-2">
-              <button
-                onClick={() => setActiveToiletryView("hanging")}
-                className={`flex-1 rounded-lg py-1.5 px-2 text-[11px] font-bold transition border ${
-                  activeToiletryView === "hanging"
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-card text-muted-foreground border-border hover:text-foreground"
-                }`}
-              >
-                Open (Hanging)
-              </button>
-              <button
-                onClick={() => setActiveToiletryView("folded")}
-                className={`flex-1 rounded-lg py-1.5 px-2 text-[11px] font-bold transition border ${
-                  activeToiletryView === "folded"
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-card text-muted-foreground border-border hover:text-foreground"
-                }`}
-              >
-                Folded ({selectedToiletryColor.name})
-              </button>
-            </div>
-          </div>
-
-          {/* Details side */}
-          <div className="p-8 sm:p-10 flex flex-col justify-center">
-            <span className="text-xs font-bold uppercase tracking-wider text-accent">
-              KAYANU Signature Travel Gear
-            </span>
-            <h3 className="mt-1 text-2xl font-extrabold text-foreground">
-              Hanging Toiletry Bag — XL
-            </h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              3 dedicated leak-proof & breathable mesh storage zones, 360° swivel metal hanging hook, and water-resistant wipe-clean fabric.
-            </p>
-
-            {/* Price */}
-            <div className="mt-5 flex items-baseline gap-3">
-              <span className="text-2xl font-extrabold text-foreground">$24.99</span>
-              <span className="text-sm text-muted-foreground line-through">$34.99</span>
-              <span className="text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full">
-                In Stock & Ready to Ship
-              </span>
-            </div>
-
-            {/* Color Swatches */}
-            <div className="mt-6">
-              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Selected Color: <span className="text-foreground font-extrabold">{selectedToiletryColor.name}</span>
-              </p>
-              <div className="mt-2.5 flex flex-wrap gap-2.5">
-                {toiletryVariants.map((v) => (
-                  <button
-                    key={v.id}
-                    onClick={() => setSelectedToiletryColor(v)}
-                    title={v.name}
-                    aria-label={v.name}
-                    className={`flex items-center gap-1.5 rounded-xl border-2 px-3 py-1.5 text-xs font-semibold transition ${
-                      selectedToiletryColor.id === v.id
-                        ? "border-primary bg-primary/10 text-primary shadow-xs"
-                        : "border-border/80 bg-card hover:border-foreground/30 text-foreground"
-                    }`}
-                  >
-                    <span
-                      className="h-3.5 w-3.5 rounded-full border border-black/20"
-                      style={{ background: v.swatch }}
-                    />
-                    <span>{v.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Buttons */}
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={handleAddToiletry}
-                className="flex-1 flex items-center justify-center gap-2 rounded-xl border-2 border-primary bg-card py-3 text-xs font-bold text-primary hover:bg-primary/5 transition shadow-xs"
-              >
-                <ShoppingBag className="h-4 w-4" />
-                Add to Cart — $24.99
-              </button>
-              <a
-                href="https://buy.stripe.com/5kQfZg2Zo01X28Z3RG3wQ0b"
-                className="btn-primary !py-3 !px-5 text-xs font-bold flex-1 text-center"
-              >
-                Buy now
-              </a>
-            </div>
-
-            <div className="mt-4 text-center">
-              <Link
-                to="/product/$slug"
-                params={{ slug: "hanging-toiletry-bag-xl" }}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary underline underline-offset-4 hover:opacity-85"
-              >
-                View full product page, 360° hook & gallery →
-              </Link>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -820,26 +496,24 @@ function CompleteKit() {
 
 function Comparison() {
   const rows = [
-    ["Space saved", "Compresses clothes with secondary perimeter zipper", "Organizes, no compression", "None"],
-    ["Organization", "5 graduated sizes + shoe/laundry bag", "Sorted by cube", "Everything mixed"],
-    ["Zipper quality", "Heavy-duty double compression zippers", "Varies", "—"],
-    ["Dirty-clothes separation", "Included drawstring shoe/laundry bag", "Rarely included", "Not at all"],
+    ["Cost per drink", "~$1", "~$0.50", "$5–$7"],
+    ["Ready in", "~30 seconds", "~5 minutes", "10+ min detour"],
+    ["Works anywhere", "Yes", "Yes", "No"],
+    ["Needs an outlet", "No — USB-C", "No — USB-C", "—"],
   ];
   return (
-    <section className="mx-auto max-w-5xl px-5 py-20">
+    <section id="why" className="mx-auto max-w-5xl scroll-mt-28 px-5 py-20">
       <h2 className="reveal text-center text-3xl font-extrabold sm:text-4xl">
-        Why compression beats the rest
+        Why make it yourself?
       </h2>
       <div className="reveal card-soft mt-10 overflow-x-auto">
         <table className="w-full min-w-[600px] text-left text-sm">
           <thead>
             <tr className="border-b">
               <th className="p-5" />
-              <th className="bg-primary p-5 font-display text-primary-foreground">
-                KAYANU compression cubes
-              </th>
-              <th className="p-5 font-display">Regular packing cubes</th>
-              <th className="p-5 font-display">No cubes at all</th>
+              <th className="bg-primary p-5 font-display text-primary-foreground">KAYANU Blender</th>
+              <th className="p-5 font-display">KAYANU Espresso Maker</th>
+              <th className="p-5 font-display">Café / juice bar</th>
             </tr>
           </thead>
           <tbody>
@@ -852,13 +526,13 @@ function Comparison() {
                     {a}
                   </span>
                 </td>
-                <td className="p-5 text-muted-foreground">{b}</td>
-                <td className="p-5 text-muted-foreground">
+                <td className="p-5 font-medium">
                   <span className="flex gap-2">
-                    <X className="h-4 w-4 shrink-0" />
-                    {c}
+                    <Check className="h-4 w-4 shrink-0 text-accent" />
+                    {b}
                   </span>
                 </td>
+                <td className="p-5 text-muted-foreground">{c}</td>
               </tr>
             ))}
           </tbody>
@@ -875,8 +549,8 @@ function Guarantee() {
         <ShieldCheck className="mx-auto h-12 w-12 text-accent" />
         <h2 className="mt-4 text-2xl font-extrabold sm:text-3xl">30-Day Happiness Guarantee</h2>
         <p className="mx-auto mt-4 max-w-2xl text-lg opacity-90">
-          Try them on your next trip. If you don't pack lighter, send them back within 30 days for a
-          full refund.
+          Try them on your next trip, workout or workday. If they don&apos;t earn their place in
+          your bag, send them back within 30 days for a full refund.
         </p>
       </div>
     </section>
@@ -907,7 +581,7 @@ function MobileBuyBar() {
   useEffect(() => {
     const targets = [
       document.getElementById("hero-cta"),
-      document.getElementById("buy"),
+      document.getElementById("blender"),
       document.querySelector("footer"),
     ].filter((el): el is HTMLElement => el !== null);
     const visible = new Map<Element, boolean>();
@@ -924,8 +598,8 @@ function MobileBuyBar() {
       className={`fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 px-4 pt-3 backdrop-blur transition-transform duration-300 md:hidden ${show ? "translate-y-0" : "translate-y-full"}`}
       style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
     >
-      <a href="#buy" className="btn-primary w-full">
-        Shop the set — from {formatPrice(getVariant("1-set").price)}
+      <a href="#blender" className="btn-primary w-full">
+        Shop the Blender — from {formatPrice(blender.price)}
       </a>
       <p className="mt-1.5 text-center text-xs text-muted-foreground">
         Free U.S. shipping on orders $50+ · 30-day returns

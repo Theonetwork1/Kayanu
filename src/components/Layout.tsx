@@ -20,9 +20,9 @@ export function useReveal() {
 function Header() {
   const { openCart, totalItems } = useCart();
   const links = [
-    ["Shop Sets", "buy"],
-    ["Toiletry Bag", "toiletry"],
-    ["What's Inside", "inside"],
+    ["Blender", "blender"],
+    ["Espresso", "espresso"],
+    ["Why KAYANU", "why"],
     ["FAQ", "faq"],
   ];
   return (
@@ -63,7 +63,7 @@ function Header() {
             </button>
 
             <a
-              href="/#buy"
+              href="/#blender"
               className="flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
             >
               Shop now
@@ -95,7 +95,7 @@ function Footer() {
       <div className="mx-auto grid max-w-6xl gap-8 px-5 py-14 md:grid-cols-2">
         <div>
           <p className="font-display text-2xl font-extrabold tracking-[0.2em]">{STORE_NAME}</p>
-          <p className="mt-2 opacity-80">Premium travel essentials. Pack more, stress less.</p>
+          <p className="mt-2 opacity-80">Portable essentials. Take it anywhere.</p>
         </div>
         <nav className="-mx-2 flex flex-wrap gap-x-2 text-sm md:justify-end">
           {links.map(([to, l]) => (
