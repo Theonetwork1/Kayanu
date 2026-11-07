@@ -15,6 +15,7 @@ import {
 import { useCart } from "@/context/CartContext";
 import { trackPurchase, getLastCheckoutTotal } from "@/lib/meta-pixel";
 import { SiteShell, useReveal } from "@/components/Layout";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 import {
   SITE_URL,
   WELCOME_CODE,
@@ -212,6 +213,7 @@ function Home() {
       <Comparison />
       <Guarantee />
       <Faq />
+      <Newsletter />
       {WELCOME_CODE && <WelcomeOffer code={WELCOME_CODE} />}
       <MobileBuyBar />
     </SiteShell>
@@ -550,6 +552,20 @@ function Guarantee() {
           Try them on your next trip, workout or workday. If they don&apos;t earn their place in
           your bag, send them back within 30 days for a full refund.
         </p>
+      </div>
+    </section>
+  );
+}
+
+function Newsletter() {
+  return (
+    <section className="px-5 pb-20">
+      <div className="reveal card-soft mx-auto max-w-3xl p-8 text-center sm:p-12">
+        <h2 className="text-2xl font-extrabold sm:text-3xl">Join the list</h2>
+        <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+          New products, restocks and honest updates — no spam, no daily noise.
+        </p>
+        <NewsletterSignup />
       </div>
     </section>
   );
