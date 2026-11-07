@@ -84,6 +84,7 @@ function Header() {
 
 function Footer() {
   const links = [
+    ["/about", "About"],
     ["/shipping", "Shipping Policy"],
     ["/returns", "Returns & Refunds"],
     ["/privacy", "Privacy Policy"],
