@@ -53,12 +53,15 @@ export function CartDrawer() {
       // Fallback
     }
 
-    // 2. Direct fallback to Stripe checkout URL of primary item or default
+    // 2. Direct fallback to a Stripe checkout URL of an item, if one exists.
+    // No fallback URL is hardcoded: a stale link would sell a product that
+    // is no longer on the store.
     const fallbackItem = items.find((i) => i.checkoutUrl) || items[0];
     if (fallbackItem?.checkoutUrl) {
       window.location.href = appendPromo(fallbackItem.checkoutUrl);
     } else {
-      window.location.href = appendPromo("https://buy.stripe.com/aFabJ09nMeWR9Br87W3wQ09");
+      // No direct checkout link: stay in the cart so the customer can retry.
+      setCheckingOut(false);
     }
   };
 
@@ -123,7 +126,7 @@ export function CartDrawer() {
                   Your cart is empty
                 </h3>
                 <p className="mt-1 max-w-xs text-xs text-muted-foreground">
-                  Looks like you haven't added any compression gear yet.
+                  Looks like you haven't added anything yet.
                 </p>
                 <button
                   onClick={closeCart}

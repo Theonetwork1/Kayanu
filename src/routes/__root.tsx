@@ -82,10 +82,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#0C3B3C" },
-      { title: "KAYANU — Compression Packing Cubes | Pack More, Stress Less" },
+      { title: "KAYANU — Portable Blender & Espresso Maker | Take It Anywhere" },
       {
         name: "description",
-        content: "Premium compression packing cubes from KAYANU. Pack more, stress less.",
+        content: "Portable USB-C blender and 20-bar self-heating espresso maker from KAYANU. Smoothies and real espresso anywhere.",
       },
       { property: "og:site_name", content: "KAYANU" },
       { property: "og:locale", content: "en_US" },

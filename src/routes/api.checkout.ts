@@ -29,9 +29,11 @@ export const Route = createFileRoute("/api/checkout")({
 
         const stripeKey = getStripeKey();
         if (!stripeKey) {
-          // If Stripe secret key isn't set yet in .env, return the first available fallback checkout URL
-          const fallback = items.find((i) => i.checkoutUrl)?.checkoutUrl || "https://buy.stripe.com/aFabJ09nMeWR9Br87W3wQ09";
-          return json({ url: fallback });
+          // If Stripe secret key isn't set yet in .env, fall back to a direct
+          // checkout URL if the cart has one; never a hardcoded stale link.
+          const fallback = items.find((i) => i.checkoutUrl)?.checkoutUrl;
+          if (fallback) return json({ url: fallback });
+          return json({ error: "Checkout is temporarily unavailable. Please try again." }, 502);
         }
 
         try {
@@ -88,8 +90,9 @@ export const Route = createFileRoute("/api/checkout")({
           return json({ url: session.url });
         } catch (err) {
           console.error("Stripe checkout session creation failed:", err);
-          const fallback = items.find((i) => i.checkoutUrl)?.checkoutUrl || "https://buy.stripe.com/aFabJ09nMeWR9Br87W3wQ09";
-          return json({ url: fallback });
+          const fallback = items.find((i) => i.checkoutUrl)?.checkoutUrl;
+          if (fallback) return json({ url: fallback });
+          return json({ error: "Checkout is temporarily unavailable. Please try again." }, 502);
         }
       },
     },
